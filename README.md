@@ -48,3 +48,20 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 ## Prerequisites
 * python >= 3.6.9
 * scapy >= 2.4.4
+
+
+
+## Run  
+Python programs are executed on mininet hosts.
+
+### Sender  
+   ```shell
+   $ pyenv activate <name>
+   $ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count]
+   ```
+
+### Receiver  
+   ```shell
+   $ pyenv activate <name>
+   $ python3 receiver.py [-if interface]
+   ```
