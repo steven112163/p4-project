@@ -3,7 +3,7 @@
 
 const bit<16> TYPE_MYTTL = 0x1212;
 const bit<16> TYPE_ARP   = 0x0806;
-const bit<8>  init_ttl   = (bit<8>) 255;
+const bit<8>  INIT_TTL   = (bit<8>) 255;
 
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
@@ -21,7 +21,7 @@ header ethernet_t {
 
 header myTtl_t {
   bit<16>     proto_id;
-  switchID_t  swid;
+  switchID_t  src_swid;
   bit<8>      ttl;
 }
 
@@ -75,9 +75,9 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
     std_meta.egress_spec = port_num;
   }
 
-  action multicast(){
-    std_meta.mcast_grp = 1;
-  }
+  // action multicast(){
+  //   std_meta.mcast_grp = 1;
+  // }
 
   action get_switch_id(switchID_t swid) {
     meta.swid = swid;
@@ -85,8 +85,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
   action add_myTtl_and_multicast(switchID_t swid) {
     hdr.myTtl.setValid();
-    hdr.myTtl.ttl = init_ttl;
-    hdr.myTtl.swid = swid;
+    hdr.myTtl.ttl = INIT_TTL;
+    hdr.myTtl.src_swid = swid;
     hdr.myTtl.proto_id = hdr.ethernet.ether_type;
     hdr.ethernet.ether_type = TYPE_MYTTL;
     std_meta.mcast_grp = 1;
@@ -95,15 +95,15 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
   table switch_id_table {
 
     key = {
-      hdr.myTtl.swid: exact;
+      hdr.myTtl.src_swid: exact;  // Useless match field
     }
-    
+
     actions = {
       get_switch_id;
       drop;
       NoAction;
     }
-    default_action = NoAction;
+    default_action = get_switch_id;
 
   }
 
@@ -119,7 +119,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       drop;
       NoAction;
     }
-    default_action = NoAction;
+    default_action = add_myTtl_and_multicast;
 
   }
 
@@ -134,8 +134,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       
       switch_id_table.apply(); // grab id info should must match entry
 
-      port_reg.read(port, meta.swid);
-      ttl_reg.read(ttl, meta.swid);
+      port_reg.read(port, myTtl.src_swid);
+      ttl_reg.read(ttl, myTtl.src_swid);
 
       if(hdr.myTtl.ttl<ttl){
         mark_to_drop(std_meta);
@@ -143,7 +143,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       else if(hdr.myTtl.ttl==ttl && (bit<16>)std_meta.ingress_port != port ){
         mark_to_drop(std_meta);
       }
-      else if( hdr.myTtl.swid == meta.swid){
+      else if( hdr.myTtl.src_swid == meta.swid){
         mark_to_drop(std_meta);
       }
       else{
@@ -160,12 +160,12 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 /* Engress Processing */
 control MyEgress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta){
 
-  action forward(egressSpec_t port_num) {
-    std_meta.egress_spec = port_num;
-  }
+  // action forward(egressSpec_t port_num) {
+  //   std_meta.egress_spec = port_num;
+  // }
 
-  action remove_myTtl_and_forward(egressSpec_t port_num) {
-    std_meta.egress_spec = port_num;
+  action remove_myTtl() {
+    // std_meta.egress_spec = port_num;
     hdr.ethernet.ether_type = hdr.myTtl.proto_id;
     hdr.myTtl.setInvalid();
   }
@@ -173,12 +173,12 @@ control MyEgress(inout headers hdr, inout metadata meta, inout standard_metadata
   table host_table  {
 
     key = {
-      hdr.ethernet.dst_addr: exact;
+      std_meta.egress_port: exact;
     }
 
     actions = {
-      forward;
-      remove_myTtl_and_forward;
+      // forward;
+      remove_myTtl;
       NoAction;
     }
     default_action = NoAction;
