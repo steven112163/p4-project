@@ -51,13 +51,25 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 
 
 
+## Make
+|Command|Description|
+|---|---|
+|`make build`|Compile p4 program|
+
+
+
 ## Run  
 Python programs are executed on mininet hosts.
+
+### P4 Compilation  
+   ```shell
+   $ make build
+   ```
 
 ### Sender  
    ```shell
    $ pyenv activate <name>
-   $ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count]
+   $ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count] [-t (0-1)] [-i list_of_ids]
    ```
 
 ### Receiver  

@@ -1,7 +1,8 @@
-from scapy.fields import ShortField
+from scapy.fields import ShortField, FieldListField
 from scapy.packet import Packet
 
 
 class IntHeader(Packet):
-    name = "In-band Telemetry Header"
-    fields_desc = [ShortField('id', 1)]
+    name = "In-band Network Telemetry Header"
+    fields_desc = [ShortField('len', None),
+                   FieldListField('id', [], ShortField('', None), count_from=lambda p: p.len)]
