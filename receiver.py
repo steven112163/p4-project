@@ -3,6 +3,7 @@ from scapy.layers.l2 import Ether, ARP
 from scapy.packet import Packet
 from scapy.sendrecv import sniff
 from datetime import datetime
+from header import IntHeader
 import sys
 
 
@@ -23,6 +24,8 @@ def handler(pkt: Packet) -> None:
     # Only process ARP requests
     if pkt[ARP].op == 1 and pkt[Ether].dst == 'ff:ff:ff:ff:ff:ff':
         info_log(f'Got ARP request from IP: {pkt[ARP].psrc}, MAC: {pkt[ARP].hwsrc}')
+        IntHeader(bytes(pkt[ARP].payload)).show()
+        pkt.show()
 
     return
 
