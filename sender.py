@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, Namespace
-from scapy.layers.l2 import ARP
-from scapy.sendrecv import send
+from scapy.layers.l2 import Ether, ARP
+from scapy.sendrecv import sendp
 
 
 def parse_arguments() -> Namespace:
@@ -30,4 +30,5 @@ if __name__ == '__main__':
     count = args.count
 
     # Send packets
-    send(ARP(op=1, psrc=src_ip, pdst=dst_ip), iface=interface, count=count)
+    packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip)
+    sendp(packet, iface=interface, count=count)

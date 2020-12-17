@@ -1,5 +1,6 @@
 from argparse import ArgumentParser, Namespace
-from scapy.layers.l2 import ARP
+from scapy.layers.l2 import Ether, ARP
+from scapy.packet import Packet
 from scapy.sendrecv import sniff
 from datetime import datetime
 import sys
@@ -14,12 +15,16 @@ def sniffer(name_of_interface: str) -> None:
     sniff(lfilter=lambda pkt: ARP in pkt, iface=name_of_interface, prn=lambda x: handler(x))
 
 
-def handler(pkt):
+def handler(pkt: Packet) -> None:
     """
     Handler dealing with captured ARP requests
-    :return: information about the request
+    :return: None
     """
-    return pkt.summary()
+    # Only process ARP requests
+    if pkt[ARP].op == 1 and pkt[Ether].dst == 'ff:ff:ff:ff:ff:ff':
+        info_log(f'Got ARP request from IP: {pkt[ARP].psrc}, MAC: {pkt[ARP].hwsrc}')
+
+    return
 
 
 def info_log(log: str) -> None:
