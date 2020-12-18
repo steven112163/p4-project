@@ -1,5 +1,7 @@
 # p4-project
-Project of Programmable Network Switches Fall 2020 NCTU 可程式化網路交換機 5271
+Project of Programmable Network Switches Fall 2020 NCTU 可程式化網路交換機 5271  
+  
+`p4_node.py` is from [p4-tutorial](https://github.com/p4lang/tutorials) and adapted by Steven Yuan (steven112163@gmail.com).
 
 
 
@@ -48,6 +50,8 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 ## Prerequisites
 * python >= 3.6.9
 * scapy >= 2.4.4
+* mininet >= 2.3.0.dev6
+* psutil >= 5.7.3
 
 
 
