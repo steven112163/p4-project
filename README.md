@@ -55,6 +55,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |Command|Description|
 |---|---|
 |`make build`|Compile p4 program|
+|`make clean`|Clean mininet and delete build directory|
 
 
 

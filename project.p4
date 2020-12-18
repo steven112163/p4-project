@@ -45,13 +45,17 @@ parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout stand
     pkt.extract(hdr.ethernet);
     transition select(hdr.ethernet.ether_type) {
       TYPE_MYTTL: parse_myTtl;
+      TYPE_ARP: parse_arp;
       default: accept;
     }
   }
 
   state parse_myTtl {
     pkt.extract(hdr.myTtl);
-    transition accept;
+    transition parse_arp;
+  }
+
+  state parse_arp {
   }
 
 }
@@ -103,7 +107,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       drop;
       NoAction;
     }
-    default_action = get_switch_id;
+    default_action = NoAction;
 
   }
 
@@ -119,7 +123,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       drop;
       NoAction;
     }
-    default_action = add_myTtl_and_multicast;
+    default_action = NoAction;
 
   }
 
@@ -134,8 +138,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       
       switch_id_table.apply(); // grab id info should must match entry
 
-      port_reg.read(port, myTtl.src_swid);
-      ttl_reg.read(ttl, myTtl.src_swid);
+      port_reg.read(port, hdr.myTtl.src_swid);
+      ttl_reg.read(ttl, hdr.myTtl.src_swid);
 
       if(hdr.myTtl.ttl<ttl){
         mark_to_drop(std_meta);
@@ -207,6 +211,7 @@ control MyDeparser(packet_out packet, in headers hdr){
   apply{
     packet.emit(hdr.ethernet);
     packet.emit(hdr.myTtl);
+    packet.emit(hdr.arp);
   }
 }
 
