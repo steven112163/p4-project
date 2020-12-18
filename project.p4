@@ -25,12 +25,21 @@ header myTtl_t {
   bit<8>      ttl;
 }
 
+header arp_t {
+  bit<16> htype;
+  bit<16> ptype;
+  bit<8>  hlen;
+  bit<8>  plen;
+  bit<16> oper;
+}
+
 struct metadata{
   switchID_t  swid;
 }
 
 struct headers{
   ethernet_t   ethernet;
+  arp_t        arp;
   myTtl_t      myTtl;
 }
 
@@ -52,10 +61,15 @@ parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout stand
 
   state parse_myTtl {
     pkt.extract(hdr.myTtl);
-    transition parse_arp;
+    transition select(hdr.myTtl.proto_id) {
+      TYPE_ARP: parse_arp;
+      default: accept;
+    }
   }
 
   state parse_arp {
+    pkt.extract(hdr.arp);
+    transition accept;
   }
 
 }
