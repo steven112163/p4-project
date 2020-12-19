@@ -1,7 +1,5 @@
 # p4-project
-Project of Programmable Network Switches Fall 2020 NCTU 可程式化網路交換機 5271  
-  
-`p4_node.py` is from [p4-tutorial](https://github.com/p4lang/tutorials) and adapted by Steven Yuan (steven112163@gmail.com).
+Project of Programmable Network Switches Fall 2020 NCTU 可程式化網路交換機 5271
 
 
 
@@ -34,12 +32,12 @@ Pyenv is used because the development environment is Ubuntu 16.04.
     ```shell
     $ cd p4-project
     $ pyenv local 3.6.9
-    $ pyenv virtualenv <name>
+    $ pyenv virtualenv my_p4_environment
     ```
 
 7. Use the virtual environment for development  
     ```shell
-    $ pyenv activate <name>
+    $ pyenv activate my_p4_environment
     ```
     ```shell
     $ pyenv deactivate
@@ -51,7 +49,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 * python >= 3.6.9
 * scapy >= 2.4.4
 * mininet >= 2.3.0.dev6
-* psutil >= 5.7.3
+* [p4-utils](https://github.com/nsg-ethz/p4-utils)
 
 
 
@@ -60,15 +58,18 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |---|---|
 |`make build`|Compile p4 program|
 |`make clean`|Clean mininet and delete build directory|
+|`make run`|Start test environment|
 
 
 
 ## Run  
 Python programs are executed on mininet hosts.
 
-### P4 Compilation  
+1. Rewrite `topology/p4app.json` to fit current test situation
+
+2. Start test environment  
    ```shell
-   $ make build
+   $ make run
    ```
 
 ### Sender  

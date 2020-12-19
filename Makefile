@@ -1,5 +1,5 @@
 BUILD_DIR = build
-PYCACHE_DIR = __pycache__
+PYCACHE_DIR = host_test/__pycache__
 
 default:
 	$(error Please specify a make target (see README.md))
@@ -14,6 +14,9 @@ p4-build: project.p4
 		project.p4
 
 build: p4-build
+
+run:
+	sudo p4run --config topology/p4app.json
 
 clean:
 	$(info *** Cleaning...)
