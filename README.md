@@ -49,6 +49,8 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 * python >= 3.6.9
 * scapy >= 2.4.4
 * mininet >= 2.3.0.dev6
+* pandas >= 1.1.5
+* matplotlib >= 3.3.3
 * [p4-utils](https://github.com/nsg-ethz/p4-utils)
 
 

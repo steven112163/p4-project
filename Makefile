@@ -1,5 +1,6 @@
 BUILD_DIR = build
 PYCACHE_DIR = host_test/__pycache__
+RESULT_DIR = results
 
 default:
 	$(error Please specify a make target (see README.md))
@@ -21,4 +22,4 @@ run:
 clean:
 	$(info *** Cleaning...)
 	sudo mn -c
-	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR)
+	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR)

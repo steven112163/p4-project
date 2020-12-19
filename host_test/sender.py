@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
 from scapy.layers.l2 import Ether, ARP
 from scapy.sendrecv import sendp
@@ -15,6 +16,16 @@ def check_test_type(value: str) -> int:
         raise ArgumentTypeError(f'"{value}" is an invalid value. It should be 0 or 1')
 
     return int_value
+
+
+def info_log(log: str) -> None:
+    """
+    Print logs
+    :param log: log to be displayed
+    :return: None
+    """
+    print(f'[\033[96mINFO\033[00m] {log}')
+    sys.stdout.flush()
 
 
 def parse_arguments() -> Namespace:
@@ -50,8 +61,9 @@ if __name__ == '__main__':
 
     # Send packets
     if test:
+        info_log(f'INT ARP with ids: {ids}')
         packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip) / IntHeader(len=len(ids), id=ids)
     else:
+        info_log('Pure ARP')
         packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip)
-    packet.show()
     sendp(packet, iface=interface, count=count)
