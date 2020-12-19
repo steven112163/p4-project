@@ -1,26 +1,64 @@
 {
   "target": "bmv2",
-  "p4info": "/* INFO PATH */",
-  "bmv2_json": "/* JSON PATH */",
+  "p4info": "build/project.p4info.txt",
+  "bmv2_json": "build/project.json/project.json",
   "table_entries": [
     {
-      "table": "MyIngress.l2_fwd_lpm",
+      "table": "MyIngress.switch_id_table",
       "match": {
-        "hdr.ethernet.dst_id": ["10.0.3.3", 32]
+        "hdr.myTtl.src_swid": 1
       },
-      "action_name": "MyIngress.myTunnel_forward",
+      "action_name": "MyIngress.get_switch_id",
       "action_params": {
-        "port": 3
+        "switchID_t": 1
       }
     },
     {
-      "table": "MyEgress.neighbor_lpm",
+      "table": "MyIngress.switch_id_table",
       "match": {
-        "hdr.ethernet.dst_id": ["10.0.1.1", 32]
+        "hdr.myTtl.src_swid": 2
       },
-      "action_name": "MyIngress.neighbor_rm_header",
+      "action_name": "MyIngress.get_switch_id",
+      "action_params": {
+        "switchID_t": 1
+      }
+    },
+    {
+      "table": "MyIngress.switch_id_table",
+      "match": {
+        "hdr.myTtl.src_swid": 3
+      },
+      "action_name": "MyIngress.get_switch_id",
+      "action_params": {
+        "switchID_t": 1
+      }
+    },
+    {
+      "table": "MyEgress.host_table",
+      "match": {
+        "std_meta.egress_port": 1
+      },
+      "action_name": "MyEgress.remove_myTtl",
       "action_params": {
       }
+    }
+  ],"multicast_group_entries" : [
+    {
+      "multicast_group_id" : 1,
+      "replicas" : [
+        {
+          "egress_port" : 1,
+          "instance" : 1
+        },
+        {
+          "egress_port" : 2,
+          "instance" : 1
+        },
+        {
+          "egress_port" : 3,
+          "instance" : 1
+        }
+      ]
     }
   ]
 }
