@@ -54,12 +54,12 @@ struct parser_metadata_t {
 }
 
 
-struct metadata{
+struct metadata {
   switchID_t  swid;
   parser_metadata_t  parser_metadata;
 }
 
-struct headers{
+struct headers {
   ethernet_t   ethernet;
   arp_t        arp;
   myTtl_t      myTtl;
@@ -68,7 +68,7 @@ struct headers{
 }
 
 /* Parser */
-parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout standard_metadata_t smeta){
+parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout standard_metadata_t smeta) {
 
   state start {
     transition parse_ethernet;
@@ -102,7 +102,7 @@ parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout stand
   state parse_int {
     pkt.extract(hdr.int_count);
     meta.parser_metadata.num_headers_remaining = hdr.int_count.num_switches;
-    transition select(meta.parser_metadata.num_headers_remaining){
+    transition select(meta.parser_metadata.num_headers_remaining) {
       0: accept;
       default: parse_int_headers;
     }
@@ -110,8 +110,8 @@ parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout stand
 
   state parse_int_headers {
     pkt.extract(hdr.int_headers.next);
-    meta.parser_metadata.num_headers_remaining = meta.parser_metadata.num_headers_remaining -1 ;
-    transition select(meta.parser_metadata.num_headers_remaining){
+    meta.parser_metadata.num_headers_remaining = meta.parser_metadata.num_headers_remaining - 1 ;
+    transition select(meta.parser_metadata.num_headers_remaining) {
       0: accept;
       default: parse_int_headers;
     }
@@ -120,12 +120,12 @@ parser MyParser(packet_in pkt, out headers hdr, inout metadata meta, inout stand
 }
 
 /* Checksum Verification */
-control MyVerifyChecksum(inout headers hdr, inout metadata meta){
+control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
   apply {  }
 }
 
 /* Ingress Processing */
-control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta){
+control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta) {
 
   register<bit<9>> (NUM_OF_SWITCHES) port_reg;
   register<bit<8>> (NUM_OF_SWITCHES) ttl_reg;
@@ -142,42 +142,20 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
     meta.swid = swid;
   }
 
-  action add_myTtl_and_int_multicast() {
+  action add_myTtl_multicast(switchID_t swid) {
     // add ttl
     hdr.myTtl.setValid();
     hdr.myTtl.ttl = INIT_TTL;
-    hdr.myTtl.src_swid = meta.swid;
+    hdr.myTtl.src_swid = swid;
     hdr.myTtl.proto_id = hdr.ethernet.ether_type;
     hdr.ethernet.ether_type = TYPE_MYTTL;
-    // add int_count
-    hdr.int_count.setValid();
-    hdr.int_count.num_switches = (bit<16>)0;
-    hdr.int_count.proto_id = hdr.arp.ptype;
-    hdr.arp.ptype = TYPE_INT;
     // multicast
     std_meta.mcast_grp = 1;
   }
 
-  action add_int_header(){
-
-    hdr.int_count.num_switches = hdr.int_count.num_switches + 1;
-
-    hdr.int_headers.push_front(1);
-    hdr.int_headers[0].setValid();
-    hdr.int_headers[0].switch_id = meta.swid;
-  }
-
-  table int_table {
-    actions = {
-       add_int_header;
-    }
-    default_action = add_int_header;
-  }
-
   table switch_id_table {
-
     key = {
-      hdr.myTtl.src_swid: exact;  // Useless match field
+      hdr.myTtl.src_swid: exact;
     }
 
     actions = {
@@ -186,47 +164,45 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       NoAction;
     }
     default_action = NoAction;
-
   }
 
   table l2 {
-
     key = {
       hdr.ethernet.dst_addr: exact;
     }
     
     actions = {
       forward;
-      add_myTtl_and_int_multicast;
+      drop;
+      add_myTtl_multicast;
+      NoAction;
     }
-    default_action = add_myTtl_and_int_multicast;
-
+    default_action = NoAction;
   }
 
   apply {
+    if(hdr.myTtl.isValid()) {
 
-    switch_id_table.apply(); // grab id info should must match entry
-
-    if(hdr.myTtl.isValid()){
-
-      hdr.myTtl.ttl = hdr.myTtl.ttl-1;
+      hdr.myTtl.ttl = hdr.myTtl.ttl - 1;
       
       bit<9> port;
       bit<8>  ttl;
 
+      switch_id_table.apply(); // grab id info should must match entry
+
       port_reg.read(port, hdr.myTtl.src_swid);
       ttl_reg.read(ttl, hdr.myTtl.src_swid);
 
-      if(hdr.myTtl.ttl<ttl){
+      if(hdr.myTtl.ttl < ttl) {
         mark_to_drop(std_meta);
       }
-      else if(hdr.myTtl.ttl==ttl && std_meta.ingress_port != port ){
+      else if(hdr.myTtl.ttl == ttl && std_meta.ingress_port != port ) {
         mark_to_drop(std_meta);
       }
-      else if( hdr.myTtl.src_swid == meta.swid){
+      else if(hdr.myTtl.src_swid == meta.swid) {
         mark_to_drop(std_meta);
       }
-      else{
+      else {
          port_reg.write(hdr.myTtl.src_swid, std_meta.ingress_port);
          ttl_reg.write(hdr.myTtl.src_swid, hdr.myTtl.ttl);
          std_meta.mcast_grp = 1;
@@ -235,60 +211,75 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
     else {
       l2.apply(); // not contain a ttl hdr -> forwarding table Match
     }
-
-    if( hdr.int_count.isValid() ) {
-      int_table.apply();
-    }
   }
-
 }
 
 /* Engress Processing */
-control MyEgress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta){
+control MyEgress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta) {
 
-  action remove_myTtl_and_int() {
+  action remove_myTtl() {
     hdr.ethernet.ether_type = hdr.myTtl.proto_id;
     hdr.myTtl.setInvalid();
-
-    hdr.arp.ptype = hdr.int_count.proto_id;
-    hdr.int_count.setInvalid();
-    hdr.int_headers.pop_front(hdr.int_headers.size);
+    if(hdr.int_count.isValid())
+      hdr.arp.ptype = hdr.int_count.proto_id;
   }
 
-  table host_table  {
-
+  table host_table {
     key = {
       std_meta.egress_port: exact;
     }
 
     actions = {
-      remove_myTtl_and_int;
+      remove_myTtl;
       NoAction;
     }
     default_action = NoAction;
+  }
 
+  action add_int() {
+    hdr.int_count.setValid();
+    hdr.int_count.num_switches = (bit<16>)1;
+    hdr.int_count.proto_id = hdr.arp.ptype;
+    hdr.arp.ptype = TYPE_INT;
+
+    // Add int header
+    hdr.int_headers.push_front(1);
+    hdr.int_headers[0].setValid();
+    hdr.int_headers[0].switch_id = hdr.myTtl.src_swid;
+  }
+
+  action add_int_header() {
+    hdr.int_count.num_switches = hdr.int_count.num_switches + 1;
+
+    hdr.int_headers.push_front(1);
+    hdr.int_headers[0].setValid();
+    hdr.int_headers[0].switch_id = meta.swid;
   }
 
   apply {
-
     // if ingress port == egress port -> drop
     if (std_meta.ingress_port == std_meta.egress_port) {
       mark_to_drop(std_meta);
     }
-    else{
+    else {
+      if(!hdr.int_count.isValid())
+        add_int();
+      else
+        add_int_header();
+      // if neighbor is a host -> remove myTtl
       host_table.apply();
     }
   }
 }
 
 /* Checksum Update */
-control MyComputeChecksum(inout headers hdr, inout metadata meta){
+control MyComputeChecksum(inout headers hdr, inout metadata meta) {
   apply {  }
 }
 
 /* Deparser */
-control MyDeparser(packet_out packet, in headers hdr){
-  apply{
+control MyDeparser(packet_out packet, in headers hdr) {
+  apply {
     packet.emit(hdr.ethernet);
     packet.emit(hdr.myTtl);
     packet.emit(hdr.arp);

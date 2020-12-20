@@ -4,4 +4,5 @@ mc_node_associate 1 0
 table_add switch_id_table get_switch_id 1 => 1
 table_add switch_id_table get_switch_id 2 => 1
 table_add switch_id_table get_switch_id 3 => 1
-table_add host_table remove_myTtl_and_int 1 =>
+table_add l2 add_myTtl_multicast ff:ff:ff:ff:ff:ff => 1
+table_add host_table remove_myTtl 1 =>
