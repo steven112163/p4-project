@@ -17,9 +17,9 @@ p4-build: project.p4
 build: p4-build
 
 run:
-	sudo p4run --config topology/p4app.json
+	sudo p4run
 
 clean:
 	$(info *** Cleaning...)
 	sudo mn -c
-	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR)
+	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR) *pcap *log topology.db project.json project.p4i

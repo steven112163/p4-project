@@ -34,8 +34,8 @@ def parse_arguments() -> Namespace:
     :return: arguments
     """
     parser = ArgumentParser()
-    parser.add_argument('-src', '--source', help="Source IP", type=str, default='10.0.0.1')
-    parser.add_argument('-dst', '--destination', help='Destination IP', type=str, default='10.0.0.2')
+    parser.add_argument('-src', '--source', help="Source IP", type=str, default='10.0.1.1')
+    parser.add_argument('-dst', '--destination', help='Destination IP', type=str, default='10.0.2.2')
     parser.add_argument('-if', '--interface', help='Name of the interface', type=str, default='h1-eth0')
     parser.add_argument('-c', '--count', help='Number of packets to be sent', type=int, default=1)
     parser.add_argument('-t', '--test', help='Whether test variable length field', type=check_test_type, default=0)
