@@ -116,7 +116,7 @@ def parse_arguments() -> Namespace:
 if __name__ == '__main__':
     """
     Main function
-        command: python3 receiver.py [-if interface]
+        command: python3 receiver.py [-if interface] [-to timeout]
     """
     # Parse arguments
     args = parse_arguments()

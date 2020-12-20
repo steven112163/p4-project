@@ -67,21 +67,38 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 ## Run  
 Python programs are executed on mininet hosts.
 
-1. Rewrite `topology/p4app.json` to fit current test situation
+1. Rewrite `topology/p4app.json` to set up current test situation
 
 2. Start test environment  
    ```shell
    $ make run
    ```
 
+3. Call the terminals of sender and receiver
+   ```shell
+   $ xterm h1 h2
+   ```
+
+4. Start receiver in h2
+   ```shell
+   $ sh receive.sh
+   ```
+
+5. Start sender in h1
+   ```shell
+   $ sh send.sh
+   ```
+
 ### Sender  
    ```shell
-   $ pyenv activate <name>
+   $ pyenv activate my_p4_environment
+   $ cd host_test
    $ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count] [-t (0-1)] [-i list_of_ids]
    ```
 
 ### Receiver  
    ```shell
-   $ pyenv activate <name>
-   $ python3 receiver.py [-if interface]
+   $ pyenv activate my_p4_environment
+   $ cd host_test
+   $ python3 receiver.py [-if interface]  [-to timeout]
    ```
