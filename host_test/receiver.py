@@ -12,15 +12,16 @@ from header import IntHeader
 from math import floor, ceil
 
 
-def sniffer(name_of_interface: str) -> None:
+def sniffer(name_of_interface: str, timeout: int) -> None:
     """
     Sniffer sniffing ARP packets
     :param name_of_interface: name of the interface to be sniffed
+    :param timeout: stop sniffing after given seconds
     :return: None
     """
     start_time = time()
     sniff(lfilter=lambda pkt: ARP in pkt, iface=name_of_interface,
-          prn=lambda x: handler(x, name_of_interface, start_time))
+          prn=lambda x: handler(x, name_of_interface, start_time), timeout=timeout)
 
 
 def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
@@ -107,6 +108,7 @@ def parse_arguments() -> Namespace:
     """
     parser = ArgumentParser()
     parser.add_argument('-if', '--interface', help='Name of the interface', type=str, default='h2-eth0')
+    parser.add_argument('-to', '--timeout', help='Stop sniffing after the given seconds', type=int, default=10)
 
     return parser.parse_args()
 
@@ -119,14 +121,12 @@ if __name__ == '__main__':
     # Parse arguments
     args = parse_arguments()
     interface = args.interface
+    to = args.timeout
 
     # Start sniffer
     info_log(f'{datetime.now()}')
     info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
-    try:
-        sniffer(interface)
-    except KeyboardInterrupt:
-        pass
+    sniffer(interface, to)
 
     # Plot the result
     plot_the_result(interface)
