@@ -2,12 +2,14 @@ import sys
 import os
 import time
 import pandas as pd
+import matplotlib.pyplot as plt
 from argparse import ArgumentParser, Namespace
 from scapy.layers.l2 import Ether, ARP
 from scapy.packet import Packet, Padding
 from scapy.sendrecv import sniff
 from datetime import datetime
 from header import IntHeader
+from math import floor, ceil
 
 
 def sniffer(name_of_interface: str) -> None:
@@ -59,8 +61,33 @@ def plot_the_result(name_of_interface: str) -> None:
     :param name_of_interface: name of the interface to be sniffed
     :return: None
     """
-    # TODO
-    pass
+    # Read result file
+    filename = f'../results/{name_of_interface}.csv'
+    result = pd.read_csv(filename)
+
+    # Get count of each length of the route
+    count = result.groupby(['Num_of_switch'], as_index=False).count()
+    del count['Time']
+    count.rename(columns={'IDs': 'Count'}, inplace=True)
+    plt.subplot(121)
+    plt.bar(count['Num_of_switch'], count['Count'])
+    plt.xticks(range(floor(min(count['Num_of_switch'])), ceil(max(count['Num_of_switch'])) + 1))
+    plt.yticks(range(0, ceil(max(count['Count'])) + 1))
+    plt.ylabel('Count')
+    plt.xlabel('Length of the route')
+    plt.title('Count of each length of route')
+
+    # Get occurrence of each length of the route
+    plt.subplot(122)
+    for i in result['Num_of_switch'].unique():
+        plt.plot(result['Time'], [1 if r == i else 0 for r in result['Num_of_switch']], label=f'{i} hop(s)')
+    plt.legend()
+    plt.ylabel('Appear or not')
+    plt.xlabel('Time (s)')
+    plt.title('Occurrence')
+
+    plt.tight_layout()
+    plt.show()
 
 
 def info_log(log: str) -> None:
@@ -98,5 +125,8 @@ if __name__ == '__main__':
     info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
     try:
         sniffer(interface)
+        while True:
+            pass
     except KeyboardInterrupt:
+        # Press ctrl-c two times to plot the graph
         plot_the_result(interface)
