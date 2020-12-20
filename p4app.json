@@ -60,15 +60,15 @@
         },
         "switches": {
             "s1": {
-                "cli_input": "s1-commands.txt",
+                "cli_input": "./runtime_commands/s1-commands.txt",
                 "program": "project.p4"
             },
             "s2": {
-                "cli_input": "s2-commands.txt",
+                "cli_input": "./runtime_commands/s2-commands.txt",
                 "program": "project.p4"
             },
             "s3": {
-                "cli_input": "s3-commands.txt",
+                "cli_input": "./runtime_commands/s3-commands.txt",
                 "program": "project.p4"
             }
         }

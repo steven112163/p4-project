@@ -1,8 +1,8 @@
 import sys
 import os
-import time
-import pandas as pd
 import matplotlib.pyplot as plt
+from time import time
+from pandas import DataFrame, read_csv
 from argparse import ArgumentParser, Namespace
 from scapy.layers.l2 import Ether, ARP
 from scapy.packet import Packet, Padding
@@ -18,7 +18,7 @@ def sniffer(name_of_interface: str) -> None:
     :param name_of_interface: name of the interface to be sniffed
     :return: None
     """
-    start_time = time.time()
+    start_time = time()
     sniff(lfilter=lambda pkt: ARP in pkt, iface=name_of_interface,
           prn=lambda x: handler(x, name_of_interface, start_time))
 
@@ -31,7 +31,7 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
     :param start_time: starting time of the sniffer
     :return: None
     """
-    elapsed_time = time.time() - start_time
+    elapsed_time = time() - start_time
     # Only process ARP requests
     if pkt[ARP].op == 1 and pkt[Ether].dst == 'ff:ff:ff:ff:ff:ff':
         info_log(f'Got ARP request from IP: {pkt[ARP].psrc}, MAC: {pkt[ARP].hwsrc}, {elapsed_time}')
@@ -43,10 +43,10 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
             # Store the result
             filename = f'../results/{name_of_interface}.csv'
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            new_entry = pd.DataFrame([[int_header.len, ', '.join([str(i) for i in int_header.id]), elapsed_time]],
-                                     columns=['Num_of_switch', 'IDs', 'Time'])
+            new_entry = DataFrame([[int_header.len, ', '.join([str(i) for i in int_header.id]), elapsed_time]],
+                                  columns=['Num_of_switch', 'IDs', 'Time'])
             if os.path.exists(filename):
-                result = pd.read_csv(filename)
+                result = read_csv(filename)
                 result = result.append(new_entry, ignore_index=True)
                 result.to_csv(filename, index=False)
             else:
@@ -63,11 +63,10 @@ def plot_the_result(name_of_interface: str) -> None:
     """
     # Read result file
     filename = f'../results/{name_of_interface}.csv'
-    result = pd.read_csv(filename)
+    result = read_csv(filename)
 
     # Get count of each length of the route
     count = result.groupby(['Num_of_switch'], as_index=False).count()
-    del count['Time']
     count.rename(columns={'IDs': 'Count'}, inplace=True)
     plt.subplot(121)
     plt.bar(count['Num_of_switch'], count['Count'])
@@ -82,6 +81,7 @@ def plot_the_result(name_of_interface: str) -> None:
     for i in result['Num_of_switch'].unique():
         plt.plot(result['Time'], [1 if r == i else 0 for r in result['Num_of_switch']], label=f'{i} hop(s)')
     plt.legend()
+    plt.yticks([0, 1], ['Not', 'Appear'])
     plt.ylabel('Appear or not')
     plt.xlabel('Time (s)')
     plt.title('Occurrence')
@@ -125,8 +125,8 @@ if __name__ == '__main__':
     info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
     try:
         sniffer(interface)
-        while True:
-            pass
     except KeyboardInterrupt:
-        # Press ctrl-c two times to plot the graph
-        plot_the_result(interface)
+        pass
+
+    # Plot the result
+    plot_the_result(interface)
