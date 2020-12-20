@@ -165,8 +165,8 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
         mark_to_drop(std_meta);
       }
       else{
-         port_reg.write(meta.swid, std_meta.ingress_port);
-         ttl_reg.write(meta.swid, hdr.myTtl.ttl);
+         port_reg.write(hdr.myTtl.src_swid, std_meta.ingress_port);
+         ttl_reg.write(hdr.myTtl.src_swid, hdr.myTtl.ttl);
          std_meta.mcast_grp = 1;
       }
     }
