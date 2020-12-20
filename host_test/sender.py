@@ -62,7 +62,8 @@ if __name__ == '__main__':
     # Send packets
     if test:
         info_log(f'INT ARP with ids: {ids}')
-        packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip) / IntHeader(len=len(ids), id=ids)
+        packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip) / IntHeader(
+            proto=int('0x0800', 16), len=len(ids), id=ids)
     else:
         info_log('Pure ARP')
         packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip)

@@ -4,5 +4,6 @@ from scapy.packet import Packet
 
 class IntHeader(Packet):
     name = "In-band Network Telemetry Header"
-    fields_desc = [ShortField('len', None),
+    fields_desc = [ShortField('proto', None),
+                   ShortField('len', None),
                    FieldListField('id', [], ShortField('', None), count_from=lambda p: p.len)]
