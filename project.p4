@@ -82,7 +82,7 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta){
 /* Ingress Processing */
 control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta){
 
-  register<bit<16>>(num_of_switch) port_reg;
+  register<bit<9>> (num_of_switch) port_reg;
   register<bit<8>> (num_of_switch) ttl_reg;
 
   action drop() {
@@ -147,7 +147,7 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
 
       hdr.myTtl.ttl = hdr.myTtl.ttl-1;
       
-      bit<16> port;
+      bit<9> port;
       bit<8>  ttl;
       
       switch_id_table.apply(); // grab id info should must match entry
@@ -158,13 +158,15 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
       if(hdr.myTtl.ttl<ttl){
         mark_to_drop(std_meta);
       }
-      else if(hdr.myTtl.ttl==ttl && (bit<16>)std_meta.ingress_port != port ){
+      else if(hdr.myTtl.ttl==ttl && std_meta.ingress_port != port ){
         mark_to_drop(std_meta);
       }
       else if( hdr.myTtl.src_swid == meta.swid){
         mark_to_drop(std_meta);
       }
       else{
+         port_reg.write(meta.swid, std_meta.ingress_port);
+         ttl_reg.write(meta.swid, hdr.myTtl.ttl);
          std_meta.mcast_grp = 1;
       }
     }
