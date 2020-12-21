@@ -5,7 +5,6 @@ const bit<16> TYPE_MYTTL = 0x1212;
 const bit<16> TYPE_ARP   = 0x0806;
 const bit<16> TYPE_INT   = 0x9487 ;
 
-const bit<8>  INIT_TTL   = (bit<8>) 255;
 
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
@@ -25,7 +24,6 @@ header ethernet_t {
 header myTtl_t {
   bit<16>     proto_id;
   switchID_t  src_swid;
-  bit<8>      ttl;
 }
 
 header int_count_t {
@@ -52,7 +50,6 @@ header arp_t {
 struct parser_metadata_t {
   bit<16> num_headers_remaining;
 }
-
 
 struct metadata {
   switchID_t  swid;
@@ -128,7 +125,6 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadata_t std_meta) {
 
   register<bit<9>> (NUM_OF_SWITCHES) port_reg;
-  register<bit<8>> (NUM_OF_SWITCHES) ttl_reg;
 
   action drop() {
     mark_to_drop(std_meta);
@@ -145,7 +141,6 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
   action add_myTtl_multicast(switchID_t swid) {
     // add ttl
     hdr.myTtl.setValid();
-    hdr.myTtl.ttl = INIT_TTL;
     hdr.myTtl.src_swid = swid;
     hdr.myTtl.proto_id = hdr.ethernet.ether_type;
     hdr.ethernet.ether_type = TYPE_MYTTL;
@@ -183,30 +178,21 @@ control MyIngress(inout headers hdr, inout metadata meta, inout standard_metadat
   apply {
     if(hdr.myTtl.isValid()) {
 
-      hdr.myTtl.ttl = hdr.myTtl.ttl - 1;
-      
       bit<9> port;
-      bit<8>  ttl;
 
       switch_id_table.apply(); // grab id info should must match entry
 
       port_reg.read(port, hdr.myTtl.src_swid);
-      ttl_reg.read(ttl, hdr.myTtl.src_swid);
 
-      if(hdr.myTtl.ttl < ttl) {
+      if( port == (bit<9>) 0 ) {
+        port_reg.write(hdr.myTtl.src_swid, std_meta.ingress_port);
+        port = std_meta.ingress_port;
+      }
+
+      if( std_meta.ingress_port != port || hdr.myTtl.src_swid == meta.swid )
         mark_to_drop(std_meta);
-      }
-      else if(hdr.myTtl.ttl == ttl && std_meta.ingress_port != port ) {
-        mark_to_drop(std_meta);
-      }
-      else if(hdr.myTtl.src_swid == meta.swid) {
-        mark_to_drop(std_meta);
-      }
-      else {
-         port_reg.write(hdr.myTtl.src_swid, std_meta.ingress_port);
-         ttl_reg.write(hdr.myTtl.src_swid, hdr.myTtl.ttl);
-         std_meta.mcast_grp = 1;
-      }
+      else
+        std_meta.mcast_grp = 1;
     }
     else {
       l2.apply(); // not contain a ttl hdr -> forwarding table Match
