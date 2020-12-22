@@ -1,6 +1,7 @@
 import sys
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 from time import time
 from pandas import DataFrame, read_csv
 from argparse import ArgumentParser, Namespace
@@ -29,7 +30,7 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
     Handler dealing with captured ARP requests
     :param pkt: packet received
     :param name_of_interface: name of the interface to be sniffed
-    :param start_time: starting time of the sniffer
+    :param start_time: start time
     :return: None
     """
     elapsed_time = time() - start_time
@@ -44,7 +45,9 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
             # Store the result
             filename = f'../results/{name_of_interface}.csv'
             os.makedirs(os.path.dirname(filename), exist_ok=True)
-            new_entry = DataFrame([[int_header.len, ', '.join([str(i) for i in int_header.id]), elapsed_time]],
+            ids = list(int_header.id)
+            ids.reverse()
+            new_entry = DataFrame([[int_header.len, ', '.join([str(i) for i in ids]), elapsed_time]],
                                   columns=['Num_of_switch', 'IDs', 'Time'])
             if os.path.exists(filename):
                 result = read_csv(filename)
@@ -66,26 +69,32 @@ def plot_the_result(name_of_interface: str) -> None:
     filename = f'../results/{name_of_interface}.csv'
     result = read_csv(filename)
 
-    # Get count of each length of the route
-    count = result.groupby(['Num_of_switch'], as_index=False).count()
-    count.rename(columns={'IDs': 'Count'}, inplace=True)
+    # Occurrences vs. Route
+    count = result.groupby(['IDs'], as_index=False).count()
+    count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
     plt.subplot(121)
-    plt.bar(count['Num_of_switch'], count['Count'])
-    plt.xticks(range(floor(min(count['Num_of_switch'])), ceil(max(count['Num_of_switch'])) + 1))
+    plt.bar(count['IDs'], count['Count'])
     plt.yticks(range(0, ceil(max(count['Count'])) + 1))
-    plt.ylabel('Count')
-    plt.xlabel('Length of the route')
-    plt.title('Count of each length of route')
+    plt.ylabel('The number of occurrences')
+    plt.xlabel('Route')
+    plt.title('Occurrences vs. Route')
 
-    # Get occurrence of each length of the route
+    # Occurrence of the route vs. Time
     plt.subplot(122)
-    for i in result['Num_of_switch'].unique():
-        plt.plot(result['Time'], [1 if r == i else 0 for r in result['Num_of_switch']], label=f'{i} hop(s)')
+    result.sort_values(by=['Time'], inplace=True)
+    minimum = min(result['Time'])
+    x_coord = np.arange(minimum, max(result['Time']), 0.001, dtype=float)
+    for i in result['IDs'].unique():
+        selected = result[result['IDs'] == i]
+        y_coord = np.zeros(x_coord.shape, dtype=int)
+        for t in selected['Time']:
+            y_coord[int((t-minimum)/0.001)] = 1
+        plt.plot(x_coord, y_coord, label=f'{i}')
     plt.legend()
     plt.yticks([0, 1], ['Not', 'Appear'])
     plt.ylabel('Appear or not')
     plt.xlabel('Time (s)')
-    plt.title('Occurrence')
+    plt.title('Occurrences of the route vs. Time')
 
     plt.tight_layout()
     plt.show()

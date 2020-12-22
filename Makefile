@@ -22,4 +22,4 @@ run:
 clean:
 	$(info *** Cleaning...)
 	sudo mn -c
-	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR) *pcap *log topology.db project.json project.p4i
+	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR) *pcap *log topology.db project*.json project*.p4i
