@@ -16,10 +16,26 @@ p4-build: project.p4
 
 build: p4-build
 
-run:
+run1:
+	python3 randomizer.py
+	sudo p4run
+
+run_random1:
+	python3 randomizer.py -r 1
+	sudo p4run
+
+run2:
+	python3 randomizer.py -v 1
+	sudo p4run
+
+run_random2:
+	python3 randomizer.py -v 1 -r 1
 	sudo p4run
 
 clean:
 	$(info *** Cleaning...)
 	sudo mn -c
-	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(RESULT_DIR) *pcap *log topology.db project*.json project*.p4i
+	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) *pcap *log topology.db project*.json project*.p4i p4app.json
+
+clean_all: clean
+	sudo rm -rf $(RESULT_DIR)

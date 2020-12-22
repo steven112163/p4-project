@@ -59,35 +59,53 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |Command|Description|
 |---|---|
 |`make build`|Compile p4 program|
-|`make clean`|Clean mininet and delete build directory|
-|`make run`|Start test environment|
+|`make clean`|Clean mininet and delete environment-related directory|
+|`make clean_all`|`make clean` and delete results|
+|`make run1`|Start version 1 test|
+|`make run_random1`|Start version 1 test with random link delay|
+|`make run2`|Start version 2 test|
+|`make run_random2`|Start version 2 test with random link delay|
 
 
 
 ## Run  
 Python programs are executed on mininet hosts.
 
-1. Rewrite `topology/p4app.json` to set up current test situation
+1. Rewrite `p4app.json.txt` to set up current test environment.
 
-2. Start test environment  
+2. Start test environment.  
    ```shell
-   $ make run
+   $ make run1
+   ```  
+   or  
+   ```shell
+   $ make run_random1
+   ```  
+   or  
+   ```shell
+   $ make run2
+   ```  
+   or  
+   ```shell
+   $ make run_random2
    ```
 
-3. Call the terminals of sender and receiver
+3. Call the terminals of sender and receiver.
    ```shell
    $ xterm h1 h2
    ```
 
-4. Start receiver in h2
+4. Start receiver in h2.
    ```shell
    $ sh receive.sh
    ```
 
-5. Start sender in h1
+5. Start sender in h1.
    ```shell
    $ sh send.sh
    ```
+
+6. Terminate the process in h2 with `ctrl+c` to see the result graph.
 
 ### Sender  
    ```shell
@@ -100,5 +118,5 @@ Python programs are executed on mininet hosts.
    ```shell
    $ pyenv activate my_p4_environment
    $ cd host_test
-   $ python3 receiver.py [-if interface]  [-to timeout]
+   $ python3 receiver.py [-if interface]
    ```

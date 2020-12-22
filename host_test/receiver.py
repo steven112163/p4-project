@@ -10,19 +10,18 @@ from scapy.packet import Packet, Padding
 from scapy.sendrecv import sniff
 from datetime import datetime
 from header import IntHeader
-from math import floor, ceil
+from math import ceil
 
 
-def sniffer(name_of_interface: str, timeout: int) -> None:
+def sniffer(name_of_interface: str) -> None:
     """
     Sniffer sniffing ARP packets
     :param name_of_interface: name of the interface to be sniffed
-    :param timeout: stop sniffing after given seconds
     :return: None
     """
     start_time = time()
     sniff(lfilter=lambda pkt: ARP in pkt, iface=name_of_interface,
-          prn=lambda x: handler(x, name_of_interface, start_time), timeout=timeout)
+          prn=lambda x: handler(x, name_of_interface, start_time))
 
 
 def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
@@ -88,7 +87,7 @@ def plot_the_result(name_of_interface: str) -> None:
         selected = result[result['IDs'] == i]
         y_coord = np.zeros(x_coord.shape, dtype=int)
         for t in selected['Time']:
-            y_coord[int((t-minimum)/0.001)] = 1
+            y_coord[int((t - minimum) / 0.001)] = 1
         plt.plot(x_coord, y_coord, label=f'{i}')
     plt.legend()
     plt.yticks([0, 1], ['Not', 'Appear'])
@@ -117,7 +116,6 @@ def parse_arguments() -> Namespace:
     """
     parser = ArgumentParser()
     parser.add_argument('-if', '--interface', help='Name of the interface', type=str, default='h2-eth0')
-    parser.add_argument('-to', '--timeout', help='Stop sniffing after the given seconds', type=int, default=10)
 
     return parser.parse_args()
 
@@ -125,17 +123,16 @@ def parse_arguments() -> Namespace:
 if __name__ == '__main__':
     """
     Main function
-        command: python3 receiver.py [-if interface] [-to timeout]
+        command: python3 receiver.py [-if interface]
     """
     # Parse arguments
     args = parse_arguments()
     interface = args.interface
-    to = args.timeout
 
     # Start sniffer
     info_log(f'{datetime.now()}')
     info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
-    sniffer(interface, to)
+    sniffer(interface)
 
     # Plot the result
     plot_the_result(interface)
