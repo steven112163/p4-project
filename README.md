@@ -68,6 +68,42 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 
 
 
+## Python Programs
+### sender.py  
+Send ARP packets.
+```shell
+$ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count] [-t (0-1)] [-i list_of_ids]
+```
+|Parameter|Description|Default|
+|---|---|---|
+|-src, --source|source IP address|10.0.1.1|
+|-dst, --destination|destination IP address|10.0.2.2|
+|-if, --interface|name of the interface which sends packets|h1-eth0|
+|-c, --count|number of packets to be sent|1|
+|-t, --test|whether to test variable length field in pure mininet|0 (False)|
+|-i, --id|IDs to be placed in variable length field|list(1)|
+
+### receiver.py  
+Receive ARP packets and extract the traversed path.  
+```shell
+$ python3 receiver.py [-if interface]
+```  
+|Parameter|Description|Default|
+|---|---|---|
+|-if, --interface|name of the interface on which the sniffer is|h2-eth0|
+
+### randomizer.py  
+Randomize the link delay between switches.  
+```shell
+$ python3 randomizer.py [-v (0-1)] [-r (0-1)]
+```
+|Parameter|Description|Default|
+|---|---|---|
+|-v, --version|version of the P4 architecture|0 (version 1)|
+|-r, --random|randomize or not|0 (False)|
+
+
+
 ## Run  
 Python programs are executed on mininet hosts.
 

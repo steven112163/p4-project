@@ -13,23 +13,25 @@ from header import IntHeader
 from math import ceil
 
 
-def sniffer(name_of_interface: str) -> None:
+def sniffer(name_of_interface: str, record_time: datetime) -> None:
     """
     Sniffer sniffing ARP packets
     :param name_of_interface: name of the interface to be sniffed
+    :param record_time: datetime of the test record
     :return: None
     """
     start_time = time()
     sniff(lfilter=lambda pkt: ARP in pkt, iface=name_of_interface,
-          prn=lambda x: handler(x, name_of_interface, start_time))
+          prn=lambda x: handler(x, name_of_interface, start_time, record_time))
 
 
-def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
+def handler(pkt: Packet, name_of_interface: str, start_time: float, record_time: datetime) -> None:
     """
     Handler dealing with captured ARP requests
     :param pkt: packet received
     :param name_of_interface: name of the interface to be sniffed
     :param start_time: start time
+    :param record_time: datetime of the test record
     :return: None
     """
     elapsed_time = time() - start_time
@@ -42,7 +44,7 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
             info_log(f'Traverse {int_header.len} switch(es) with id(s): {int_header.id}\n')
 
             # Store the result
-            filename = f'../results/{name_of_interface}.csv'
+            filename = f'../results/{name_of_interface}_{record_time}.csv'
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             ids = list(int_header.id)
             ids.reverse()
@@ -58,14 +60,15 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float) -> None:
     return
 
 
-def plot_the_result(name_of_interface: str) -> None:
+def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     """
     Plot the result
     :param name_of_interface: name of the interface to be sniffed
+    :param record_time: datetime of the test record
     :return: None
     """
     # Read result file
-    filename = f'../results/{name_of_interface}.csv'
+    filename = f'../results/{name_of_interface}_{record_time}.csv'
     result = read_csv(filename)
 
     # Occurrences vs. Route
@@ -130,9 +133,10 @@ if __name__ == '__main__':
     interface = args.interface
 
     # Start sniffer
-    info_log(f'{datetime.now()}')
+    record_t = datetime.now()
+    info_log(f'{record_t}')
     info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
-    sniffer(interface)
+    sniffer(interface, record_t)
 
     # Plot the result
-    plot_the_result(interface)
+    plot_the_result(interface, record_t)

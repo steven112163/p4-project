@@ -2,3 +2,10 @@
 .python-version
 __pycache__
 build
+log
+pcap
+topology.db
+results
+p4app.json
+project*.json
+project*.p4i

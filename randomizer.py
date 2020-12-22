@@ -83,8 +83,8 @@ def parse_arguments() -> Namespace:
     :return: arguments
     """
     parser = ArgumentParser()
-    parser.add_argument('-v', '--version', help='Version of P4 architecture', type=check_int_range, default=0)
-    parser.add_argument('-r', '--random', help='Random or not', type=check_int_range, default=0)
+    parser.add_argument('-v', '--version', help='Version of the P4 architecture', type=check_int_range, default=0)
+    parser.add_argument('-r', '--random', help='Randomize or not', type=check_int_range, default=0)
 
     return parser.parse_args()
 
