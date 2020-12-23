@@ -39,3 +39,6 @@ clean:
 
 clean_all: clean
 	sudo rm -rf $(RESULT_DIR)
+
+aggregate: $(RESULT_DIR)
+	sh aggregate.sh

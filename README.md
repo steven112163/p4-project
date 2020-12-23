@@ -65,6 +65,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |`make run_random1`|Start version 1 test with random link delay|
 |`make run2`|Start version 2 test|
 |`make run_random2`|Start version 2 test with random link delay|
+|`make aggregate`|Aggregate all random results|
 
 
 
@@ -101,6 +102,16 @@ $ python3 randomizer.py [-v (0-1)] [-r (0-1)]
 |---|---|---|
 |-v, --version|version of the P4 architecture|0 (version 1)|
 |-r, --random|randomize or not|0 (False)|
+
+### aggregator.py  
+Aggregate all random results.  
+```shell
+$ python3 aggregator.py [-d name_of_the_directory] [-c num_of_packets]
+```  
+|Parameter|Description|Default|
+|---|---|---|
+|-d, --directory|name of the directory|'results'|
+|-c, --count|number of packets sent in each round|5|
 
 
 
