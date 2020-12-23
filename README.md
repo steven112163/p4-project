@@ -77,9 +77,9 @@ $ python3 sender.py [-src srcIP] [-dst dstIP] [-if interface] [-c count] [-t (0-
 ```
 |Parameter|Description|Default|
 |---|---|---|
-|-src, --source|source IP address|10.0.1.1|
-|-dst, --destination|destination IP address|10.0.2.2|
-|-if, --interface|name of the interface which sends packets|h1-eth0|
+|-src, --source|source IP address|'10.0.1.1'|
+|-dst, --destination|destination IP address|'10.0.2.2'|
+|-if, --interface|name of the interface which sends packets|'h1-eth0'|
 |-c, --count|number of packets to be sent|1|
 |-t, --test|whether to test variable length field in pure mininet|0 (False)|
 |-i, --id|IDs to be placed in variable length field|list(1)|
@@ -91,7 +91,7 @@ $ python3 receiver.py [-if interface]
 ```  
 |Parameter|Description|Default|
 |---|---|---|
-|-if, --interface|name of the interface on which the sniffer is|h2-eth0|
+|-if, --interface|name of the interface on which the sniffer is|'h2-eth0'|
 
 ### randomizer.py  
 Randomize the link delay between switches.  
