@@ -71,18 +71,25 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     filename = f'../results/{name_of_interface}_{record_time}.csv'
     result = read_csv(filename)
 
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
+
     # Occurrences vs. Route
     count = result.groupby(['IDs'], as_index=False).count()
     count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
-    plt.subplot(121)
-    plt.bar(count['IDs'], count['Count'])
-    plt.yticks(range(0, ceil(max(count['Count'])) + 1))
-    plt.ylabel('The number of occurrences')
-    plt.xlabel('Route')
-    plt.title('Occurrences vs. Route')
+    rects = ax1.bar(count['IDs'], count['Count'])
+    for rect in rects:
+        height = rect.get_height()
+        ax1.annotate(f'{height}',
+                     xy=(rect.get_x() + rect.get_width() / 2, height),
+                     xytext=(0, 3),  # 3 points vertical offset
+                     textcoords="offset points",
+                     ha='center', va='bottom')
+    ax1.set_yticks(range(0, ceil(max(count['Count'])) + 2))
+    ax1.set_ylabel('The number of occurrences')
+    ax1.set_xlabel('Route')
+    ax1.set_title('Occurrences vs. Route')
 
     # Occurrence of the route vs. Time
-    plt.subplot(122)
     result.sort_values(by=['Time'], inplace=True)
     minimum = min(result['Time'])
     x_coord = np.arange(minimum, max(result['Time']), 0.001, dtype=float)
@@ -91,14 +98,15 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
         y_coord = np.zeros(x_coord.shape, dtype=int)
         for t in selected['Time']:
             y_coord[int((t - minimum) / 0.001)] = 1
-        plt.plot(x_coord, y_coord, label=f'{i}')
-    plt.legend()
-    plt.yticks([0, 1], ['Not', 'Appear'])
-    plt.ylabel('Appear or not')
-    plt.xlabel('Time (s)')
-    plt.title('Occurrences of the route vs. Time')
+        ax2.plot(x_coord, y_coord, label=f'{i}')
+    ax2.legend()
+    ax2.set_yticks([0, 1])
+    ax2.set_yticklabels(['Not', 'Appear'])
+    ax2.set_ylabel('Appear or not')
+    ax2.set_xlabel('Time (s)')
+    ax2.set_title('Occurrences of the route vs. Time')
 
-    plt.tight_layout()
+    fig.tight_layout()
     plt.show()
 
 
