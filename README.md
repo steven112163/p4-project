@@ -62,9 +62,11 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |`make clean`|Clean mininet and delete environment-related directory|
 |`make clean_all`|`make clean` and delete results|
 |`make run1`|Start version 1 test|
-|`make run_random1`|Start version 1 test with random link delay|
+|`make worst1`|Start version 1 worst case test|
+|`make random1`|Start version 1 test with random link delay|
 |`make run2`|Start version 2 test|
-|`make run_random2`|Start version 2 test with random link delay|
+|`make worst2`|Start version 2 worst case test|
+|`make random2`|Start version 2 test with random link delay|
 |`make aggregate`|Aggregate all random results|
 
 
@@ -97,12 +99,12 @@ $ python3 receiver.py [-if interface]
 ### randomizer.py  
 Randomize the link delay between switches.  
 ```shell
-$ python3 randomizer.py [-v (0-1)] [-r (0-1)]
+$ python3 randomizer.py [-v (0-1)] [-r (0-2)]
 ```
 |Parameter|Description|Default|
 |---|---|---|
 |-v, --version|version of the P4 architecture|0 (version 1)|
-|-r, --random|randomize or not|0 (False)|
+|-r, --random|mode of link delay|0 (equal link delay)|
 
 ### aggregator.py  
 Aggregate all random results.  
@@ -124,18 +126,18 @@ Python programs are executed on mininet hosts.
 2. Start test environment.  
    ```shell
    $ make run1
-   ```  
-   or  
-   ```shell
-   $ make run_random1
+   or
+   $ make worst1
+   or
+   $ make random1
    ```  
    or  
    ```shell
    $ make run2
-   ```  
-   or  
-   ```shell
-   $ make run_random2
+   or
+   $ make worst2
+   or
+   $ make random2
    ```
 
 3. Call the terminals of sender and receiver.

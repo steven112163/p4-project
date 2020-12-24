@@ -4,11 +4,11 @@ from random import randint
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
 
 
-def randomize(version: int, random_or_not: int) -> None:
+def randomize(version: int, random_mode: int) -> None:
     """
     Randomize the link delay between switches
     :param version: version of P4 architecture
-    :param random_or_not: random or not
+    :param random_mode: 0 for equal link delay, 1 for worst case, 2 for random link delay
     :return: None
     """
     if not version:
@@ -16,8 +16,8 @@ def randomize(version: int, random_or_not: int) -> None:
         with open('p4app.json.txt') as in_file:
             data = json.load(in_file)
 
-            # Random or not
-            if random_or_not:
+            # Random mode
+            if random_mode == 2:
                 # Randomize
                 links = data['topology']['links']
                 info_log('Random version 1')
@@ -25,8 +25,17 @@ def randomize(version: int, random_or_not: int) -> None:
                     if idx < 4:
                         continue
                     link[2]['delay'] = f'{randint(0, 100)}ms'
+            elif random_mode == 0:
+                # Equal delay
+                links = data['topology']['links']
+                info_log('Equal delay version 1')
+                for idx, link in enumerate(links):
+                    if idx < 4:
+                        continue
+                    link[2]['delay'] = '10ms'
             else:
-                info_log('Nonrandom version 1')
+                # Worst case
+                info_log('Worst case version 1')
 
             with open('p4app.json', 'w') as out_file:
                 json.dump(data, out_file)
@@ -38,8 +47,8 @@ def randomize(version: int, random_or_not: int) -> None:
             for value in data['topology']['switches'].values():
                 value['program'] = 'project_v2.p4'
 
-            # Random or not
-            if random_or_not:
+            # Random mode
+            if random_mode == 2:
                 # Randomize
                 info_log('Random version 2')
                 links = data['topology']['links']
@@ -47,22 +56,44 @@ def randomize(version: int, random_or_not: int) -> None:
                     if idx < 4:
                         continue
                     link[2]['delay'] = f'{randint(0, 100)}ms'
+            elif random_mode == 0:
+                # Equal delay
+                links = data['topology']['links']
+                info_log('Equal delay version 2')
+                for idx, link in enumerate(links):
+                    if idx < 4:
+                        continue
+                    link[2]['delay'] = '10ms'
             else:
-                info_log('Nonrandom version 2')
+                # Worst case
+                info_log('Worst case version 2')
 
             with open('p4app.json', 'w') as out_file:
                 json.dump(data, out_file)
 
 
-def check_int_range(value: str) -> int:
+def check_version_range(value: str) -> int:
     """
-    Check if argument is either 0 or 1
+    Check if version argument is either 0 or 1
     :param value: string value
     :return: integer value
     """
     int_value = int(value)
     if int_value != 0 and int_value != 1:
-        raise ArgumentTypeError(f'"{value}" is an invalid value. It should be 0 or 1')
+        raise ArgumentTypeError(f'"{value}" is an invalid version. It should be 0 or 1.')
+
+    return int_value
+
+
+def check_random_range(value: str) -> int:
+    """
+    Check if random argument is either 0, 1 or 2
+    :param value: string value
+    :return: integer value
+    """
+    int_value = int(value)
+    if int_value != 0 and int_value != 1 and int_value != 2:
+        raise ArgumentTypeError(f'"{value}" is an invalid random mode. It should be 0, 1 or 2.')
 
     return int_value
 
@@ -83,8 +114,8 @@ def parse_arguments() -> Namespace:
     :return: arguments
     """
     parser = ArgumentParser()
-    parser.add_argument('-v', '--version', help='Version of the P4 architecture', type=check_int_range, default=0)
-    parser.add_argument('-r', '--random', help='Randomize or not', type=check_int_range, default=0)
+    parser.add_argument('-v', '--version', help='Version of the P4 architecture', type=check_version_range, default=0)
+    parser.add_argument('-r', '--random', help='Randomize or not', type=check_random_range, default=0)
 
     return parser.parse_args()
 
@@ -92,7 +123,7 @@ def parse_arguments() -> Namespace:
 if __name__ == '__main__':
     """
     Main function
-        command: python3 randomizer.py [-v (0-1)] [-r (0-1)]
+        command: python3 randomizer.py [-v (0-1)] [-r (0-2)]
     """
     # Parse arguments
     args = parse_arguments()

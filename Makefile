@@ -20,16 +20,24 @@ run1:
 	python3 randomizer.py
 	sudo p4run
 
-run_random1:
+worst1:
 	python3 randomizer.py -r 1
+	sudo p4run
+
+random1:
+	python3 randomizer.py -r 2
 	sudo p4run
 
 run2:
 	python3 randomizer.py -v 1
 	sudo p4run
 
-run_random2:
+worst2:
 	python3 randomizer.py -v 1 -r 1
+	sudo p4run
+
+random2:
+	python3 randomizer.py -v 1 -r 2
 	sudo p4run
 
 clean:
