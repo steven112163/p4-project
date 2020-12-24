@@ -2,4 +2,5 @@
 eval "$(pyenv init -)"
 cd host_test || exit
 pyenv activate my_p4_environment
-python3 receiver.py
+iname=$(ls /sys/class/net | grep eth0)
+python3 receiver.py -if "$iname"

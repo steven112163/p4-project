@@ -107,6 +107,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     ax2.set_title('Occurrences of the route vs. Time')
 
     fig.tight_layout()
+    fig.canvas.set_window_title(f'{name_of_interface}')
     plt.show()
 
 
