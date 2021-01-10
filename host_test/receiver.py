@@ -43,8 +43,18 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float, record_time:
             int_header = IntHeader(bytes(arp[Padding]))
             info_log(f'Traverse {int_header.len} switch(es) with id(s): {int_header.id}\n')
 
+            # Get file number
+            global number
+            if not number > -1:
+                number = 0
+                filename = f'../results/{name_of_interface}_{number}.csv'
+                while os.path.exists(filename):
+                    number += 1
+                    filename = f'../results/{name_of_interface}_{number}.csv'
+            else:
+                filename = f'../results/{name_of_interface}_{number}.csv'
+
             # Store the result
-            filename = f'../results/{name_of_interface}_{record_time}.csv'
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             ids = list(int_header.id)
             ids.reverse()
@@ -68,7 +78,8 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     :return: None
     """
     # Read result file
-    filename = f'../results/{name_of_interface}_{record_time}.csv'
+    global number
+    filename = f'../results/{name_of_interface}_{number}.csv'
     result = read_csv(filename)
 
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
@@ -107,7 +118,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     ax2.set_title('Occurrences of the route vs. Time')
 
     fig.tight_layout()
-    fig.canvas.set_window_title(f'{name_of_interface}')
+    fig.canvas.set_window_title(f'{name_of_interface}, {record_time}')
     plt.show()
 
 
@@ -140,6 +151,9 @@ if __name__ == '__main__':
     # Parse arguments
     args = parse_arguments()
     interface = args.interface
+
+    # Set file number
+    number = -1
 
     # Start sniffer
     record_t = datetime.now()
