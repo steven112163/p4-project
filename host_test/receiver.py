@@ -37,22 +37,22 @@ def handler(pkt: Packet, name_of_interface: str, start_time: float, record_time:
     elapsed_time = time() - start_time
     # Only process ARP requests
     if pkt[ARP].op == 1 and pkt[Ether].dst == 'ff:ff:ff:ff:ff:ff':
-        info_log(f'Got ARP request from IP: {pkt[ARP].psrc}, MAC: {pkt[ARP].hwsrc}, {elapsed_time}')
+        info_log('Got ARP request from IP: {}, MAC: {}, {}'.format(pkt[ARP].psrc, pkt[ARP].hwsrc, elapsed_time))
         arp = pkt[ARP]
         if Padding in arp:
             int_header = IntHeader(bytes(arp[Padding]))
-            info_log(f'Traverse {int_header.len} switch(es) with id(s): {int_header.id}\n')
+            info_log('Traverse {} switch(es) with id(s): {}\n'.format(int_header.len, int_header.id))
 
             # Get file number
             global number
             if not number > -1:
                 number = 0
-                filename = f'../results/{name_of_interface}_{number}.csv'
+                filename = '../results/{}_{}.csv'.format(name_of_interface, number)
                 while os.path.exists(filename):
                     number += 1
-                    filename = f'../results/{name_of_interface}_{number}.csv'
+                    filename = '../results/{}_{}.csv'.format(name_of_interface, number)
             else:
-                filename = f'../results/{name_of_interface}_{number}.csv'
+                filename = '../results/{}_{}.csv'.format(name_of_interface, number)
 
             # Store the result
             os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -79,7 +79,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     """
     # Read result file
     global number
-    filename = f'../results/{name_of_interface}_{number}.csv'
+    filename = '../results/{}_{}.csv'.format(name_of_interface, number)
     result = read_csv(filename)
 
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
@@ -90,7 +90,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     rects = ax1.bar(count['IDs'], count['Count'])
     for rect in rects:
         height = rect.get_height()
-        ax1.annotate(f'{height}',
+        ax1.annotate('{}'.format(height),
                      xy=(rect.get_x() + rect.get_width() / 2, height),
                      xytext=(0, 3),  # 3 points vertical offset
                      textcoords="offset points",
@@ -109,7 +109,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
         y_coord = np.zeros(x_coord.shape, dtype=int)
         for t in selected['Time']:
             y_coord[int((t - minimum) / 0.001)] = 1
-        ax2.plot(x_coord, y_coord, label=f'{i}')
+        ax2.plot(x_coord, y_coord, label='{}'.format(i))
     ax2.legend()
     ax2.set_yticks([0, 1])
     ax2.set_yticklabels(['Not', 'Appear'])
@@ -118,7 +118,7 @@ def plot_the_result(name_of_interface: str, record_time: datetime) -> None:
     ax2.set_title('Occurrences of the route vs. Time')
 
     fig.tight_layout()
-    fig.canvas.set_window_title(f'{name_of_interface}, {record_time}')
+    fig.canvas.set_window_title('{}, {}'.format(name_of_interface, record_time))
     plt.show()
 
 
@@ -128,7 +128,7 @@ def info_log(log: str) -> None:
     :param log: log to be displayed
     :return: None
     """
-    print(f'[\033[96mINFO\033[00m] {log}')
+    print('[\033[96mINFO\033[00m] {}'.format(log))
     sys.stdout.flush()
 
 
@@ -157,8 +157,8 @@ if __name__ == '__main__':
 
     # Start sniffer
     record_t = datetime.now()
-    info_log(f'{record_t}')
-    info_log(f'Start sniffer on interface {interface}. Quit the sniffer with CONTROL-C.\n')
+    info_log('{}'.format(record_t))
+    info_log('Start sniffer on interface {}. Quit the sniffer with CONTROL-C.\n'.format(interface))
     sniffer(interface, record_t)
 
     # Plot the result

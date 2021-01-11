@@ -14,7 +14,7 @@ def check_int_range(value: str) -> int:
     """
     int_value = int(value)
     if int_value != 0 and int_value != 1:
-        raise ArgumentTypeError(f'"{value}" is an invalid value. It should be 0 or 1')
+        raise ArgumentTypeError('"{}" is an invalid value. It should be 0 or 1'.format(value))
 
     return int_value
 
@@ -25,7 +25,7 @@ def info_log(log: str) -> None:
     :param log: log to be displayed
     :return: None
     """
-    print(f'[\033[96mINFO\033[00m] {log}')
+    print('[\033[96mINFO\033[00m] {}'.format(log))
     sys.stdout.flush()
 
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
 
     # Send packets
     if test:
-        info_log(f'INT ARP with ids: {ids}')
+        info_log('INT ARP with ids: {}'.format(ids))
         packet = Ether(dst='ff:ff:ff:ff:ff:ff') / ARP(op=1, psrc=src_ip, pdst=dst_ip) / IntHeader(
             proto=int('0x0800', 16), len=len(ids), id=ids)
     else:
