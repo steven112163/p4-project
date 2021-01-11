@@ -7,4 +7,4 @@ fi
 cd host_test || exit
 pyenv activate my_p4_environment
 iname=$(ls /sys/class/net | grep eth0)
-timeout 10 python3 receiver.py -if "$iname"
+timeout 5s python3 receiver.py -if "$iname" || echo "finished"

@@ -50,3 +50,12 @@ clean_all: clean
 
 aggregate: $(RESULT_DIR)
 	sh aggregate.sh
+
+receive: utils/receive.sh
+	sh utils/receive.sh
+
+send: utils/send.sh
+	sh utils/send.sh
+
+send2: utils/send.sh
+	sh utils/send.sh 1
