@@ -5,7 +5,39 @@ from pandas import read_csv
 from argparse import ArgumentParser, Namespace
 from math import ceil
 
+def aggregate(dir_name: str, num_of_pkt: int) -> None:
+    """
+    Aggregate the csv results in the given directory
+    :param dir_name: name of the given directory
+    :param num_of_pkt: number of packets sent in each round
+    :return: None
+    """
+    # Aggregate all csv
+    aggregation_result = dict()
+    zero_serial_number_csv = dict()
 
+    with os.scandir(dir_name) as directory:
+        for file in directory:
+            if file.path.endswith('.csv') and file.is_file():
+                
+                if file.name.partition('-')[1] != "":
+                    host = file.name.partition('-')[0] # host the file belongs to
+                    if aggregation_result.get(host) is None: # not exist -> create one
+                        aggregation_result[host] = read_csv(file.path)
+                    else :  # exist -> append to old one
+                        part = read_csv(file.path)
+                        aggregation_result[host] = aggregation_result[host].append(part, ignore_index=True)
+
+                    # serial number
+                    serial_number = file.name.partition('_')[2][0:-4]
+                    if serial_number == '0':
+                        zero_serial_number_csv[host] = read_csv(file.path)
+
+    # Output aggregation file
+    for key in aggregation_result.keys():
+        if aggregation_result.get(key) is not None:
+            aggregation_result[key].to_csv(f'{dir_name}/{key}_aggregation.csv', index=False)
+'''
 def aggregate(dir_name: str, num_of_pkt: int) -> None:
     """
     Aggregate the csv results in the given directory
@@ -52,7 +84,7 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
         ax.set_title('Average occurrences vs. Route')
         fig.tight_layout()
         plt.show()
-
+'''
 
 def info_log(log: str) -> None:
     """
