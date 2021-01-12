@@ -1,5 +1,6 @@
 import json
 import sys
+import os
 from random import randint
 from argparse import ArgumentParser, Namespace, ArgumentTypeError
 
@@ -40,7 +41,9 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
                 file_content += 'table_add switch_id_table get_switch_id ' + str(j + 1) + " => " + str(i + 1) + '\n'
             file_content += 'table_add l2 add_myTtl_multicast ff:ff:ff:ff:ff:ff => ' + str(i + 1) + '\n'
             file_content += 'table_add host_table remove_myTtl 1 =>\n'
-            with open('runtime_commands/s' + str(i + 1) + '-commands.txt', 'w') as out_file:
+            filename = 'runtime_commands/s' + str(i + 1) + '-commands.txt'
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            with open(filename, 'w') as out_file:
                 out_file.write(file_content)
 
         # Switch info

@@ -1,9 +1,11 @@
 import sys
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 from pandas import read_csv
 from argparse import ArgumentParser, Namespace
 from math import ceil
+
 
 def aggregate(dir_name: str, num_of_pkt: int) -> None:
     """
@@ -19,27 +21,25 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
     with os.scandir(dir_name) as directory:
         for file in directory:
             if file.path.endswith('.csv') and file.is_file():
-                
-                if file.name.partition('-')[1] != "":
-                    host = file.name.partition('-')[0] # host the file belongs to
-                    if aggregation_result.get(host) is None: # not exist -> create one
+                if file.name.partition('-')[1] != '':
+                    host = file.name.partition('_')[0]  # which host the file belongs to
+                    if aggregation_result.get(host) is None:  # not exist -> create one
                         aggregation_result[host] = read_csv(file.path)
-                    else :  # exist -> append to old one
+                    else:  # exist -> append to old one
                         part = read_csv(file.path)
                         aggregation_result[host] = aggregation_result[host].append(part, ignore_index=True)
 
                     # serial number
-                    serial_number = file.name.partition('_')[2][0:-4]
+                    serial_number = file.name.partition('_')[2][:-4]
                     if serial_number == '0':
                         zero_serial_number_csv[host] = read_csv(file.path)
 
     # Plot the serial_number = 0 picture
-
     for key in zero_serial_number_csv.keys():
         if zero_serial_number_csv.get(key) is not None:
-            
+
             result = zero_serial_number_csv[key]
-            
+
             # plot
             fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2)
             # Occurrences vs. Route
@@ -48,11 +48,10 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
             rects = ax1.bar(count['IDs'], count['Count'])
             for rect in rects:
                 height = rect.get_height()
-                ax1.annotate(f'{height}')
-                ax1.annotate('{}'.format(height),
+                ax1.annotate(f'{height}',
                              xy=(rect.get_x() + rect.get_width() / 2, height),
                              xytext=(0, 3),  # 3 points vertical offset
-                             textcoords="offset points",
+                             textcoords='offset points',
                              ha='center',
                              va='bottom')
 
@@ -60,7 +59,7 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
             ax1.set_ylabel('The number of occurrences')
             ax1.set_xlabel('Route')
             ax1.set_title('Occurrences vs. Route')
-            
+
             # Occurrence of the route vs. Time
             result.sort_values(by=['Time'], inplace=True)
             minimum = min(result['Time'])
@@ -71,7 +70,6 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
                 for t in selected['Time']:
                     y_coord[int((t - minimum) / 0.001)] = 1
                 ax2.plot(x_coord, y_coord, label=f'{i}')
-                ax2.plot(x_coord, y_coord, label='{}'.format(i))
             ax2.legend()
             ax2.set_yticks([0, 1])
             ax2.set_yticklabels(['Not', 'Appear'])
@@ -81,24 +79,21 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
 
             fig.tight_layout()
             fig.canvas.set_window_title(f'{key}')
-            fig.canvas.set_window_title('{}'.format(key))
-            #fig.canvas.set_window_title(f'{name_of_interface}, {record_time}')
-            #fig.canvas.set_window_title('{}, {}'.format(name_of_interface, record_time))
             plt.show()
 
     # Output aggregation file and plot the aggregation
     for key in aggregation_result.keys():
         if aggregation_result.get(key) is not None:
-            
+
             result = aggregation_result[key]
 
             del result['Time']
             # Write the result to a file
             info_log('Record the result')
             result.to_csv(f'{dir_name}/{key}_aggregation.csv', index=False)
-            
+
             # Plot the aggregation
-            info_log('Draw')
+            info_log('Draw aggregation')
             num_of_rows = float(len(result.index)) / num_of_pkt
             count = result.groupby(['IDs'], as_index=False).count()
             count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
@@ -118,6 +113,7 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
             ax.set_title('Average occurrences vs. Route')
             fig.tight_layout()
             plt.show()
+
 
 '''
 def aggregate(dir_name: str, num_of_pkt: int) -> None:
@@ -167,6 +163,7 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
         fig.tight_layout()
         plt.show()
 '''
+
 
 def info_log(log: str) -> None:
     """

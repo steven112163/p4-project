@@ -1,6 +1,7 @@
 BUILD_DIR = build
 PYCACHE_DIR = host_test/__pycache__
 RESULT_DIR = results
+COMMANDS_DIR = runtime_commands
 
 default:
 	$(error Please specify a make target (see README.md))
@@ -43,13 +44,13 @@ random2:
 clean:
 	$(info *** Cleaning...)
 	sudo mn -c
-	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) *pcap *log topology.db project*.json project*.p4i p4app.json
+	sudo rm -rf $(BUILD_DIR) $(PYCACHE_DIR) $(COMMANDS_DIR) *pcap *log topology.db project*.json project*.p4i p4app.json
 
 clean_all: clean
 	sudo rm -rf $(RESULT_DIR)
 
 aggregate: $(RESULT_DIR)
-	sh aggregate.sh
+	sh utils/aggregate.sh 5
 
 receive: utils/receive.sh
 	sh utils/receive.sh &
