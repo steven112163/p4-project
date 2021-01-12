@@ -99,12 +99,13 @@ $ python3 receiver.py [-if interface]
 ### randomizer.py  
 Randomize the link delay between switches.  
 ```shell
-$ python3 randomizer.py [-v (0-1)] [-r (0-2)]
+$ python3 randomizer.py [-v (0-1)] [-r (0-2)] [-n (>= 3)]
 ```
-|Parameter|Description|Default|
-|---|---|---|
-|-v, --version|version of the P4 architecture|0 (version 1)|
-|-r, --random|mode of link delay|0 (equal link delay)|
+|Parameter|Description|Default|others|
+|---|---|---|---|
+|-v, --version|version of the P4 architecture|0 (version 1)|1 (version 2)|
+|-r, --random|mode of link delay|0 (equal link delay)|1 (worst Case), 2 (random link delay)|
+|-n, --number|Number of switches|3||
 
 ### aggregator.py  
 Aggregate all random results.  
