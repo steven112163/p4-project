@@ -17,28 +17,28 @@ p4-build: project.p4
 build: p4-build
 
 run1:
-	python3 randomizer.py
-	sudo p4run
+	$(info ** Equal delay version 1)
+	sh utils/run_tests.sh 4 1 0 0
 
 worst1:
-	python3 randomizer.py -r 1
-	sudo p4run
+	$(info ** Worst case version 1)
+	sh utils/run_tests.sh 4 1 0 1
 
 random1:
-	python3 randomizer.py -r 2
-	sudo p4run
+	$(info ** Random case version 1)
+	sh utils/run_tests.sh 4 5 0 2
 
 run2:
-	python3 randomizer.py -v 1
-	sudo p4run
+	$(info ** Equal delay version 2)
+	sh utils/run_tests.sh 4 1 1 0
 
 worst2:
-	python3 randomizer.py -v 1 -r 1
-	sudo p4run
+	$(info ** Worst case version 2)
+	sh utils/run_tests.sh 4 1 1 1
 
 random2:
-	python3 randomizer.py -v 1 -r 2
-	sudo p4run
+	$(info ** Random case version 2)
+	sh utils/run_tests.sh 4 5 1 2
 
 clean:
 	$(info *** Cleaning...)
@@ -52,10 +52,7 @@ aggregate: $(RESULT_DIR)
 	sh aggregate.sh
 
 receive: utils/receive.sh
-	sh utils/receive.sh
+	sh utils/receive.sh &
 
 send: utils/send.sh
-	sh utils/send.sh
-
-send2: utils/send.sh
-	sh utils/send.sh 1
+	sh utils/send.sh 1 &
