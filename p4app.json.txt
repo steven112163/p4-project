@@ -25,64 +25,6 @@
     },
     "topology": {
         "links": [
-            [
-                "h1",
-                "s1"
-            ],
-            [
-                "h2",
-                "s2"
-            ],
-            [
-                "h3",
-                "s3"
-            ],
-            [
-                "h4",
-                "s4"
-            ],
-            [
-                "s1",
-                "s2",
-                {
-                    "delay": "100ms"
-                }
-            ],
-            [
-                "s1",
-                "s3",
-                {
-                    "delay": "10ms"
-                }
-            ],
-            [
-                "s1",
-                "s4",
-                {
-                    "delay": "50ms"
-                }
-            ],
-            [
-                "s2",
-                "s3",
-                {
-                    "delay": "50ms"
-                }
-            ],
-            [
-                "s2",
-                "s4",
-                {
-                    "delay": "10ms"
-                }
-            ],
-            [
-                "s3",
-                "s4",
-                {
-                    "delay": "10ms"
-                }
-            ]
         ],
         "hosts": {
             "h1": {
@@ -95,22 +37,6 @@
             }
         },
         "switches": {
-            "s1": {
-                "cli_input": "./runtime_commands/s1-commands.txt",
-                "program": "project.p4"
-            },
-            "s2": {
-                "cli_input": "./runtime_commands/s2-commands.txt",
-                "program": "project.p4"
-            },
-            "s3": {
-                "cli_input": "./runtime_commands/s3-commands.txt",
-                "program": "project.p4"
-            },
-            "s4": {
-                "cli_input": "./runtime_commands/s4-commands.txt",
-                "program": "project.p4"
-            }
         }
     }
 }
