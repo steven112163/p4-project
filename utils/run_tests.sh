@@ -12,8 +12,8 @@ if [ -z "${NUM_OF_HOSTS}" ] || [ -z "${NUM_OF_TESTS}" ] || [ -z "${P4_ARCHI_VERS
   exit 1
 fi
 
-if [ ${NUM_OF_HOSTS} -lt 2 ]; then
-  echo "Number of hosts should be greater or equal to 2."
+if [ ${NUM_OF_HOSTS} -lt 3 ]; then
+  echo "Number of hosts should be greater or equal to 3."
   exit 1
 fi
 
@@ -42,7 +42,7 @@ sudo tmux set remain-on-exit on
 for test_no in $(seq 1 ${NUM_OF_TESTS}); do
   echo "** Test ${test_no}"
 
-  sudo tmux send-keys -t 1 "python3 randomizer.py -v ${P4_ARCHI_VERSION} -r ${RANDOM_VERSION}" Enter
+  sudo tmux send-keys -t 1 "python3 utils/randomizer.py -v ${P4_ARCHI_VERSION} -r ${RANDOM_VERSION} -n ${NUM_OF_HOSTS}" Enter
   sleep 0.5s
 
   sudo tmux send-keys -t 1 "p4run" Enter
