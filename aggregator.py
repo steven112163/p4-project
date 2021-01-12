@@ -33,10 +33,44 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
                     if serial_number == '0':
                         zero_serial_number_csv[host] = read_csv(file.path)
 
-    # Output aggregation file
+    # Plot the serial_number = 0 picture
+
+    for key in zero_serial_number_csv.keys():
+        if zero_serial_number_csv.get(key) is not None:
+            ; # plot
+
+    # Output aggregation file and plot the aggregation
     for key in aggregation_result.keys():
         if aggregation_result.get(key) is not None:
-            aggregation_result[key].to_csv(f'{dir_name}/{key}_aggregation.csv', index=False)
+            
+            result = aggregation_result[key]
+
+            del result['Time']
+            # Write the result to a file
+            info_log('Record the result')
+            result.to_csv(f'{dir_name}/{key}_aggregation.csv', index=False)
+            
+            # Plot the aggregation
+            info_log('Draw')
+            num_of_rows = float(len(result.index)) / num_of_pkt
+            count = result.groupby(['IDs'], as_index=False).count()
+            count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
+            count['Count'] = count['Count'] / num_of_rows
+            fig, ax = plt.subplots()
+            rects = ax.bar(count['IDs'], count['Count'])
+            for rect in rects:
+                height = rect.get_height()
+                ax.annotate(f'{height:.3f}',
+                            xy=(rect.get_x() + rect.get_width() / 2, height),
+                            xytext=(0, 3),  # 3 points vertical offset
+                            textcoords="offset points",
+                            ha='center', va='bottom')
+            ax.set_yticks(range(0, ceil(max(count['Count'])) + 1))
+            ax.set_ylabel('Average number of occurrences')
+            ax.set_xlabel('Route')
+            ax.set_title('Average occurrences vs. Route')
+            fig.tight_layout()
+            plt.show()
 '''
 def aggregate(dir_name: str, num_of_pkt: int) -> None:
     """
