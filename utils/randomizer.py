@@ -26,6 +26,10 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
             p4_file_name = 'project_v2.p4'
             info_log('Version 2')
 
+        if random_mode == 1:
+            if num_of_switches != 4:
+                raise ValueError('We only provide worst case for 4 switches.')
+
         # sx-commands.txt
         for i in range(num_of_switches):
             file_content = 'mc_mgrp_create 1\n'
@@ -46,6 +50,11 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
             with open(filename, 'w') as out_file:
                 out_file.write(file_content)
 
+        # Host info
+        for i in range(num_of_switches):
+            hx = 'h' + str(i+1)
+            data['topology']['hosts'][hx] = {}
+
         # Switch info
         data['program'] = p4_file_name
         for i in range(num_of_switches):
@@ -60,10 +69,10 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
             data['topology']['links'].append([hx, sx])
 
         # Links between switches
+        links = data['topology']['links']
         if random_mode == 2:
             # Randomize
             info_log('Random delay')
-            links = data['topology']['links']
             for i in range(num_of_switches):
                 for j in range(i + 1, num_of_switches):
                     sx1 = 's' + str(i + 1)
@@ -72,7 +81,6 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
         elif random_mode == 0:
             # Equal delay
             info_log('Equal delay')
-            links = data['topology']['links']
             for i in range(num_of_switches):
                 for j in range(i + 1, num_of_switches):
                     sx1 = 's' + str(i + 1)
@@ -81,7 +89,12 @@ def randomize(version: int, random_mode: int, num_of_switches: int) -> None:
         else:
             # Worst case
             info_log('Worst case')
-            # TODO
+            links.append(['s1', 's2', {'delay': '100ms'}])
+            links.append(['s1', 's3', {'delay': '10ms'}])
+            links.append(['s1', 's4', {'delay': '50ms'}])
+            links.append(['s2', 's3', {'delay': '50ms'}])
+            links.append(['s2', 's4', {'delay': '10ms'}])
+            links.append(['s3', 's4', {'delay': '10ms'}])
 
         with open('p4app.json', 'w') as out_file:
             json.dump(data, out_file)
@@ -121,7 +134,7 @@ def check_number_range(value: str) -> int:
     """
     int_value = int(value)
     if int_value < 3:
-        raise ArgumentTypeError('"{}" is an invalid random mode. It should be >= 3.'.format(value))
+        raise ArgumentTypeError('"{}" is an invalid number of switches. It should be >= 3.'.format(value))
 
     return int_value
 
@@ -133,6 +146,16 @@ def info_log(log: str) -> None:
     :return: None
     """
     print('[\033[96mINFO\033[00m] {}'.format(log))
+    sys.stdout.flush()
+
+
+def error_log(log: str) -> None:
+    """
+    Print error log
+    :param log: log to be displayed
+    :return: None
+    """
+    print('[\033[91mERROR\033[00m] {}'.format(log))
     sys.stdout.flush()
 
 
@@ -161,4 +184,7 @@ if __name__ == '__main__':
     num = args.number
 
     # Randomize p4app.json
-    randomize(ver, ran, num)
+    try:
+        randomize(ver, ran, num)
+    except ValueError as e:
+        error_log(str(e))

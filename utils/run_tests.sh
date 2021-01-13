@@ -32,6 +32,8 @@ if [ ${RANDOM_VERSION} -ne 0 ] && [ ${RANDOM_VERSION} -ne 1 ] && [ ${RANDOM_VERS
   exit 1
 fi
 
+sudo tmux start-server
+
 if [ "$(sudo tmux ls | grep ${SESSION})" ]; then
   sudo tmux kill-session -t ${SESSION}
 fi
@@ -46,24 +48,24 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
   sleep 0.5s
 
   sudo tmux send-keys -t 1 "p4run" Enter
-  sleep 8s
+  sleep 20s
 
   for host_id in $(seq 2 ${NUM_OF_HOSTS}); do
     echo "*** h${host_id} starts receiving"
     sudo tmux send-keys -t 1 "noecho h${host_id} make receive" Enter
-    sleep 2s
+    sleep 5s
   done
 
   sudo tmux send-keys -t 1 "noecho h1 make send" Enter
   echo "*** h1 starts sending"
-  sleep 4s
+  sleep 5s
 
   sudo tmux send-keys -t 1 "exit" Enter
-  sleep 3s
+  sleep 5s
 
   sudo tmux send-keys -t 1 "make clean" Enter
-  sleep 3s
+  sleep 5s
 done
 
 echo "** Finished"
-sudo tmux kill-session -t ${SESSION}
+sudo tmux -2 attach-session -t ${SESSION}

@@ -51,6 +51,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 * mininet >= 2.3.0.dev6
 * pandas >= 1.1.5
 * matplotlib >= 3.3.3
+* tmux
 * [p4-utils](https://github.com/nsg-ethz/p4-utils)
 
 
@@ -122,9 +123,8 @@ $ python3 aggregator.py [-d name_of_the_directory] [-c num_of_packets]
 ## Run  
 Python programs are executed on mininet hosts.
 
-1. Rewrite `p4app.json.txt` to set up current test environment.
-
-2. Start test environment.  
+### Auto Test  
+1. Start testing.
    ```shell
    $ make run1
    or
@@ -132,13 +132,24 @@ Python programs are executed on mininet hosts.
    or
    $ make random1
    ```  
-   or  
+   or
    ```shell
    $ make run2
    or
    $ make worst2
    or
    $ make random2
+   ```
+
+### Manual Test
+1. Setup required files for the environment.  
+   ```shell
+   $ python3 randomizer.py [-v (0-1)] [-r (0-2)] [-n (>= 3)]
+   ```
+
+2. Start the environment.
+   ```shell
+   $ sudo p4run
    ```
 
 3. Call the terminals of sender and receiver.
@@ -156,7 +167,10 @@ Python programs are executed on mininet hosts.
    $ sh send.sh [0 or 1]
    ```
 
-6. Terminate the process in h2 with `ctrl+c` to see the result graph.
+6. Execute the aggregator in another terminal to see the result.
+   ```shell
+   $ python3 aggregator.py [-d name_of_the_directory] [-c num_of_packets]
+   ```
 
 ### Sender  
    ```shell
