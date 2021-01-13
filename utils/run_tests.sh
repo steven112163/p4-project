@@ -47,8 +47,15 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
   sudo tmux send-keys -t 1 "python3 utils/randomizer.py -v ${P4_ARCHI_VERSION} -r ${RANDOM_VERSION} -n ${NUM_OF_HOSTS}" Enter
   sleep 0.5s
 
+  echo "** Starting environment ..."
   sudo tmux send-keys -t 1 "p4run" Enter
-  sleep 20s
+  if [ ${NUM_OF_HOSTS} -ge 25 ]; then
+    sleep 1m 20s
+  elif [ ${NUM_OF_HOSTS} -ge 10 ]; then
+    sleep 20s
+  else
+    sleep 10s
+  fi
 
   for host_id in $(seq 2 ${NUM_OF_HOSTS}); do
     echo "*** h${host_id} starts receiving"
@@ -68,4 +75,4 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
 done
 
 echo "** Finished"
-sudo tmux -2 attach-session -t ${SESSION}
+sudo tmux kill-session -t ${SESSION}

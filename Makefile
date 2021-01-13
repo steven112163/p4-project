@@ -33,9 +33,9 @@ ten1:
 	$(info ** Random case version 1 with 10 switches)
 	sh utils/run_tests.sh 10 10 0 2
 
-hun1:
-	$(info ** Random case version 1 with 100 switches)
-	sh utils/run_tests.sh 100 100 0 2
+tf1:
+	$(info ** Random case version 1 with 25 switches)
+	sh utils/run_tests.sh 25 10 0 2
 
 run2:
 	$(info ** Equal delay version 2)
@@ -53,9 +53,9 @@ ten2:
 	$(info ** Random case version 2 with 10 switches)
 	sh utils/run_tests.sh 10 10 1 2
 
-hun2:
-	$(info ** Random case version 2 with 100 switches)
-	sh utils/run_tests.sh 100 1 1 1 2
+tf2:
+	$(info ** Random case version 2 with 25 switches)
+	sh utils/run_tests.sh 25 10 1 2
 
 clean:
 	$(info *** Cleaning...)
@@ -66,6 +66,7 @@ clean_all: clean
 	sudo rm -rf $(RESULT_DIR)
 
 aggregate: $(RESULT_DIR)
+	$(info ** Aggregate results)
 	sh utils/aggregate.sh 5
 
 receive: utils/receive.sh

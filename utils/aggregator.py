@@ -10,11 +10,12 @@ from random import sample
 from typing import Dict
 
 
-def aggregate(dir_name: str, num_of_pkt: int) -> None:
+def aggregate(dir_name: str, num_of_pkt: int, num_of_rounds: int) -> None:
     """
     Aggregate the csv results in the given directory
     :param dir_name: name of the given directory
     :param num_of_pkt: number of packets sent in each round
+    :param num_of_rounds: number of rounds in each test
     :return: None
     """
     # Aggregate all csv
@@ -38,16 +39,17 @@ def aggregate(dir_name: str, num_of_pkt: int) -> None:
                         zero_serial_number_csv[host] = read_csv(file.path)
 
     # Draw graphs
-    draw_graphs(aggregation_result, zero_serial_number_csv, num_of_pkt)
+    draw_graphs(aggregation_result, zero_serial_number_csv, num_of_pkt, num_of_rounds)
 
 
 def draw_graphs(aggregation_result: Dict[str, DataFrame], zero_serial_number_csv: Dict[str, DataFrame],
-                num_of_pkt: int) -> None:
+                num_of_pkt: int, num_of_rounds: int) -> None:
     """
     Draw the graphs
     :param aggregation_result: aggregation result of each host
     :param zero_serial_number_csv: first result of each host
     :param num_of_pkt: number of packets in each round
+    :param num_of_rounds: number of rounds in each test
     :return: None
     """
     # Get number of rows/columns for display
@@ -108,7 +110,6 @@ def draw_graphs(aggregation_result: Dict[str, DataFrame], zero_serial_number_csv
         ax.set_xlabel('Time (s)')
         ax.set_title(f'{key}')
         fig.add_subplot(ax)
-        fig.tight_layout()
     fig.tight_layout()
     fig.canvas.set_window_title('Results of first test')
 
@@ -120,7 +121,7 @@ def draw_graphs(aggregation_result: Dict[str, DataFrame], zero_serial_number_csv
         del result['Time']
 
         # Plot the aggregation
-        num_of_tests = float(len(result.index)) / num_of_pkt
+        num_of_tests = float(len(result.index)) / num_of_pkt / num_of_rounds
         count = result.groupby(['IDs'], as_index=False).count()
         count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
         count['Count'] = count['Count'] / num_of_tests
@@ -128,15 +129,16 @@ def draw_graphs(aggregation_result: Dict[str, DataFrame], zero_serial_number_csv
         rects = ax.bar(count['IDs'], count['Count'])
         for rect in rects:
             height = rect.get_height()
-            ax.annotate(f'{height:.3f}',
+            ax.annotate(f'{height:.2f}',
                         xy=(rect.get_x() + rect.get_width() / 2, height),
                         xytext=(0, 3),  # 3 points vertical offset
                         textcoords="offset points",
                         ha='center', va='bottom')
-        ax.set_yticks(range(0, ceil(max(count['Count'])) + 1))
-        ax.set_ylabel('Average number of occurrences')
+        ax.set_yticks(range(0, ceil(max(count['Count'])) + 3))
+        ax.set_ylabel('Occurrences')
         ax.set_xlabel('Route')
-        ax.set_title(f'{key}Average occurrences vs. Route')
+        ax.set_title(f'{key}')
+        fig.add_subplot(ax)
     fig.tight_layout()
     fig.canvas.set_window_title('Aggregation result')
 
@@ -161,6 +163,7 @@ def parse_arguments() -> Namespace:
     parser = ArgumentParser()
     parser.add_argument('-d', '--directory', help='Name of the directory', type=str, default='results')
     parser.add_argument('-c', '--count', help='Number of packets sent in each round', type=int, default=5)
+    parser.add_argument('-r', '--round', help='Number of rounds in each test', type=int, default=2)
 
     return parser.parse_args()
 
@@ -168,13 +171,14 @@ def parse_arguments() -> Namespace:
 if __name__ == '__main__':
     """
     Main function
-        command: python3 aggregator.py [-d name_of_the_directory] [-c num_of_packets]
+        command: python3 aggregator.py [-d name_of_the_directory] [-c num_of_packets] [-r num_of_rounds]
     """
     # Parse arguments
     args = parse_arguments()
     name = args.directory
     c = args.count
+    r = args.round
 
     # Aggregate
     info_log('Start aggregator')
-    aggregate(name, c)
+    aggregate(name, c, r)
