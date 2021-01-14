@@ -68,9 +68,17 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
   sleep 5s
 
   sudo tmux send-keys -t 1 "exit" Enter
-  sleep 5s
+  echo "** Shutdown environment ..."
+  if [ ${NUM_OF_HOSTS} -ge 25 ]; then
+    sleep 50s
+  elif [ ${NUM_OF_HOSTS} -ge 10 ]; then
+    sleep 10s
+  else
+    sleep 5s
+  fi
 
   sudo tmux send-keys -t 1 "make clean" Enter
+  echo "** Cleaning ..."
   sleep 5s
 done
 
