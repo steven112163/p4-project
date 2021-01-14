@@ -62,17 +62,27 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |`make build`|Compile p4 program|
 |`make clean`|Clean mininet and delete environment-related directory|
 |`make clean_all`|`make clean` and delete results|
+|`make aggregate`|Aggregate all random results|  
+
+### Version 1  
+|Command|Description|
+|---|---|
 |`make run1`|Start version 1 test|
 |`make worst1`|Start version 1 worst case test|
 |`make random1`|Start version 1 test with random link delay|
 |`make ten1`|Start version 1 test with random link delay and 10 switches|
 |`make tf1`|Start version 1 test with random link delay and 25 switches|
+|`make fif1`|Start version 1 test with random link delay and 50 switches|
+
+### Version 2  
+|Command|Description|
+|---|---|
 |`make run2`|Start version 2 test|
 |`make worst2`|Start version 2 worst case test|
 |`make random2`|Start version 2 test with random link delay|
 |`make ten2`|Start version 2 test with random link delay and 10 switches|
 |`make tf2`|Start version 2 test with random link delay and 25 switches|
-|`make aggregate`|Aggregate all random results|
+|`make fif2`|Start version 2 test with random link delay and 50 switches|
 
 
 
@@ -140,6 +150,8 @@ Python programs are executed on mininet hosts.
    $ make ten1
    or
    $ make tf1
+   or
+   $ make fif2
    ```  
    or
    ```shell
@@ -152,6 +164,8 @@ Python programs are executed on mininet hosts.
    $ make ten2
    or
    $ make tf2
+   or
+   $ make fif2
    ```
 
 2. Show results.

@@ -49,7 +49,9 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
 
   echo "** Starting environment ..."
   sudo tmux send-keys -t 1 "p4run" Enter
-  if [ ${NUM_OF_HOSTS} -ge 25 ]; then
+  if [ ${NUM_OF_HOSTS} -ge 50 ]; then
+    sleep 4m 30s
+  elif [ ${NUM_OF_HOSTS} -ge 25 ]; then
     sleep 1m 20s
   elif [ ${NUM_OF_HOSTS} -ge 10 ]; then
     sleep 20s
@@ -60,8 +62,8 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
   for host_id in $(seq 2 ${NUM_OF_HOSTS}); do
     echo "*** h${host_id} starts receiving"
     sudo tmux send-keys -t 1 "noecho h${host_id} make receive" Enter
-    sleep 5s
   done
+  sleep 5s
 
   sudo tmux send-keys -t 1 "noecho h1 make send" Enter
   echo "*** h1 starts sending"
@@ -69,7 +71,9 @@ for test_no in $(seq 1 ${NUM_OF_TESTS}); do
 
   sudo tmux send-keys -t 1 "exit" Enter
   echo "** Shutdown environment ..."
-  if [ ${NUM_OF_HOSTS} -ge 25 ]; then
+  if [ ${NUM_OF_HOSTS} -ge 50 ]; then
+    sleep 2m 30s
+  elif [ ${NUM_OF_HOSTS} -ge 25 ]; then
     sleep 50s
   elif [ ${NUM_OF_HOSTS} -ge 10 ]; then
     sleep 10s
