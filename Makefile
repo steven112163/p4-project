@@ -37,9 +37,9 @@ tf1:
 	$(info ** Random case version 1 with 25 switches)
 	sh utils/run_tests.sh 25 10 0 2
 
-fif1:
-	$(info ** Random case version 1 with 25 switches)
-	sh utils/run_tests.sh 50 10 0 2
+thir1:
+	$(info ** Random case version 1 with 30 switches)
+	sh utils/run_tests.sh 30 10 0 2
 
 run2:
 	$(info ** Equal delay version 2)
@@ -61,9 +61,9 @@ tf2:
 	$(info ** Random case version 2 with 25 switches)
 	sh utils/run_tests.sh 25 10 1 2
 
-fif2:
-	$(info ** Random case version 2 with 50 switches)
-	sh utils/run_tests.sh 50 10 1 2
+thir2:
+	$(info ** Random case version 2 with 30 switches)
+	sh utils/run_tests.sh 30 10 1 2
 
 clean:
 	$(info *** Cleaning...)

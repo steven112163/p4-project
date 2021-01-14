@@ -72,7 +72,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |`make random1`|Start version 1 test with random link delay|
 |`make ten1`|Start version 1 test with random link delay and 10 switches|
 |`make tf1`|Start version 1 test with random link delay and 25 switches|
-|`make fif1`|Start version 1 test with random link delay and 50 switches|
+|`make thir1`|Start version 1 test with random link delay and 30 switches|
 
 ### Version 2  
 |Command|Description|
@@ -82,7 +82,7 @@ Pyenv is used because the development environment is Ubuntu 16.04.
 |`make random2`|Start version 2 test with random link delay|
 |`make ten2`|Start version 2 test with random link delay and 10 switches|
 |`make tf2`|Start version 2 test with random link delay and 25 switches|
-|`make fif2`|Start version 2 test with random link delay and 50 switches|
+|`make thir2`|Start version 2 test with random link delay and 30 switches|
 
 
 
@@ -151,7 +151,7 @@ Python programs are executed on mininet hosts.
    or
    $ make tf1
    or
-   $ make fif2
+   $ make thir2
    ```  
    or
    ```shell
@@ -165,7 +165,7 @@ Python programs are executed on mininet hosts.
    or
    $ make tf2
    or
-   $ make fif2
+   $ make thir2
    ```
 
 2. Show results.
