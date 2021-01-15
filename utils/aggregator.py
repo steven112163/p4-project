@@ -149,8 +149,6 @@ def draw_aggregation(aggregation_result: Dict[str, DataFrame], num_of_rows_or_co
     :param num_of_rounds: number of rounds in each test
     :return: None
     """
-    fig = plt.figure()
-    grid = gs.GridSpec(num_of_rows_or_cols, num_of_rows_or_cols)
     for idx, key in enumerate(keys):
         result = aggregation_result[key]
         del result['Time']
@@ -160,7 +158,7 @@ def draw_aggregation(aggregation_result: Dict[str, DataFrame], num_of_rows_or_co
         count = result.groupby(['IDs'], as_index=False).count()
         count.rename(columns={'Num_of_switch': 'Count'}, inplace=True)
         count['Count'] = count['Count'] / num_of_tests
-        ax = plt.Subplot(fig, grid[idx])
+        fig, ax = plt.subplots()
         rects = ax.bar(count['IDs'], count['Count'])
         for rect in rects:
             height = rect.get_height()
@@ -173,9 +171,8 @@ def draw_aggregation(aggregation_result: Dict[str, DataFrame], num_of_rows_or_co
         ax.set_ylabel('Occurrences')
         ax.set_xlabel('Route')
         ax.set_title(f'{key}')
-        fig.add_subplot(ax)
-    fig.tight_layout()
-    fig.canvas.set_window_title('Aggregation result')
+        fig.tight_layout()
+        fig.canvas.set_window_title(f'Aggregation result of {key}')
 
 
 def draw_pkt_in_each_round(pkt_in_each_round: Dict[str, Dict[str, int]], num_of_rows_or_cols: int, keys: List[str]) -> None:
